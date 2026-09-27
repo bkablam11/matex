@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MATEX - Bibliothèque Pédagogique & Communauté Nationale • CP1 au Master 2</title>
+  <meta name="description" content="Plateforme nationale de partage de ressources mathématiques en LaTeX, PDF et Word de l'école primaire au supérieur et à l'agrégation en Côte d'Ivoire.">
+  
+  <!-- Polices Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- KaTeX CSS & JS pour le rendu mathématique universel -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+  <!-- html2pdf.js pour la génération et compilation PDF haute fidélité -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Feuille de styles personnalisée MATEX -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500 selection:text-white antialiased flex flex-col justify-between">
+
+  <!-- ========================================================================= -->
+  <!-- BARRE DE NAVIGATION PRINCIPALE (Header / Navbar)                          -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      
+      <!-- Logo et Identité Visuelle MATEX -->
+      <a href="#librarySection" class="flex items-center gap-3 group">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-950 text-white font-serif text-2xl font-black shadow-md shadow-indigo-950/20 group-hover:scale-105 transition">
+          M
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-serif text-xl font-black tracking-tight text-slate-900">MATEX</span>
+            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 border border-emerald-200">
+              CIV 🇨🇮
+            </span>
+          </div>
+          <p class="text-[11px] font-semibold text-slate-500 hidden sm:block">
+            Bibliothèque Pédagogique & Communauté Nationale • CP1 au Master 2
+          </p>
+        </div>
+      </a>
+
+      <!-- Onglets de Navigation Principaux (Bibliothèque vs Formation) -->
+      <div class="flex items-center gap-1 rounded-2xl bg-slate-100 p-1 text-xs font-bold border border-slate-200">
+        <button
+          type="button"
+          id="navBtnLibrary"
+          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition bg-white text-slate-900 shadow-xs"
+        >
+          <i data-lucide="book-open" class="h-4 w-4 text-indigo-600"></i>
+          <span>Bibliothèque</span>
+        </button>
+
+        <button
+          type="button"
+          id="navBtnTraining"
+          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition text-slate-600 hover:text-slate-900"
+        >
+          <i data-lucide="graduation-cap" class="h-4 w-4 text-amber-600"></i>
+          <span>Formation LaTeX</span>
+          <span class="rounded-full bg-amber-500 text-slate-950 text-[9px] font-black px-1.5 py-0.2 shadow-2xs">
+            2ᵉ Cohorte
+          </span>
+        </button>
+      </div>
+
+      <!-- Actions Rapides (Déposer, Rejoindre WhatsApp, Faire un Don, Tester) -->
+      <div class="flex items-center gap-2 sm:gap-2.5">
+        <button
+          type="button"
+          onclick="openDiagnosticModal()"
+          class="flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/90 px-3 py-2 text-xs font-bold text-indigo-700 shadow-2xs transition hover:bg-indigo-100 hover:border-indigo-300"
+          title="Tester la liaison Google Drive & Google Sheets"
+        >
+          <i data-lucide="flask-conical" class="h-3.5 w-3.5 text-indigo-600"></i>
+          <span class="hidden sm:inline">Tester Drive & Sheets</span>
+          <span class="sm:hidden">Test Sync</span>
+        </button>
+
+        <button
+          type="button"
+          id="navBtnSubmit"
+          class="hidden md:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50"
+        >
+          <i data-lucide="plus-circle" class="h-4 w-4 text-indigo-600"></i>
+          <span>Déposer un document</span>
+        </button>
+
+        <button
+          type="button"
+          id="navBtnJoin"
+          class="flex items-center gap-1.5 rounded-xl border border-emerald-600 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-800 transition hover:bg-emerald-600 hover:text-white"
+        >
+          <i data-lucide="users" class="h-4 w-4"></i>
+          <span class="hidden sm:inline">Rejoindre MATEX</span>
+          <span class="sm:hidden">Rejoindre</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="openDonateModal()"
+          class="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-sm transition hover:from-amber-400 hover:to-amber-500"
+        >
+          <i data-lucide="heart" class="h-4 w-4 fill-slate-950 text-slate-950"></i>
+          <span>Faire un Don</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- VUE 1 : LA BIBLIOTHÈQUE MATHÉMATIQUE                                      -->
+  <!-- ========================================================================= -->
+  <main id="viewLibrary" class="flex-1">
+
+    <!-- Hero Header Banner -->
+    <section class="relative border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white overflow-hidden py-12 sm:py-16">
+      <!-- Glow background circles -->
+      <div class="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+
+      <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        
+        <!-- Tag d'officialité nationale -->
+        <div class="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-900/40 px-4 py-1.5 text-xs font-bold text-indigo-200 backdrop-blur-md mb-6">
+          <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Ressources Pédagogiques Officielles MENA & Enseignement Supérieur</span>
+        </div>
+
+        <!-- Grand Titre de la Bibliothèque -->
+        <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
+          De la Maternelle au Doctorat : <br class="hidden sm:inline">
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-indigo-200">
+            La Bibliothèque Pédagogique d'Excellence
+          </span>
+        </h1>
+
+        <!-- Sous-titre explicatif -->
+        <p class="mt-4 max-w-2xl mx-auto text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
+          Accédez à plus de 20 documents modèles conformes au référentiel officiel du Ministère de l'Éducation Nationale (MENA) et de l'Enseignement Supérieur. 
+          Consultez en PDF haute fidélité, téléchargez les codes sources LaTeX (<code class="text-emerald-400 font-mono">.tex</code>) et les versions Word éditables (<code class="text-blue-400 font-mono">.docx</code>).
+        </p>
+
+        <!-- CTA boutons du Hero -->
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+          <button
+            type="button"
+            id="btnHeroExplore"
+            class="flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-white/10 transition hover:bg-slate-100"
+          >
+            <i data-lucide="compass" class="h-4 w-4 text-indigo-700"></i>
+            <span>Explorer les Documents</span>
+          </button>
+
+          <button
+            type="button"
+            id="btnHeroTraining"
+            class="flex items-center gap-2 rounded-2xl border border-amber-400/40 bg-amber-400/10 px-6 py-3 text-xs sm:text-sm font-bold text-amber-300 backdrop-blur-md transition hover:bg-amber-400/20"
+          >
+            <i data-lucide="graduation-cap" class="h-4 w-4"></i>
+            <span>Formation Gratuite (2ᵉ Cohorte)</span>
+          </button>
+        </div>
+
+        <!-- 4 Cartes de Parcours Rapides (Shortcuts) -->
+        <div class="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl mx-auto text-left">
+          
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-emerald-400/40 group" data-cycle="primaire">
+            <span class="text-2xl">🌱</span>
+            <div class="mt-2 font-serif text-sm font-bold text-white group-hover:text-emerald-300 transition">Primaire</div>
+            <div class="text-[11px] text-slate-400">CP1, CP2, CE1, CE2, CM1, CM2</div>
+          </button>
+
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-sky-400/40 group" data-cycle="college">
+            <span class="text-2xl">📐</span>
+            <div class="mt-2 font-serif text-sm font-bold text-white group-hover:text-sky-300 transition">1er Cycle (Collège)</div>
+            <div class="text-[11px] text-slate-400">6ème, 5ème, 4ème, 3ème (BEPC)</div>
+          </button>
+
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-indigo-400/40 group" data-cycle="lycee">
+            <span class="text-2xl">🔬</span>
+            <div class="mt-2 font-serif text-sm font-bold text-white group-hover:text-indigo-300 transition">2nd Cycle (Lycée)</div>
+            <div class="text-[11px] text-slate-400">2nde A/C, 1ère A/C/D, Tle A/C/D</div>
+          </button>
+
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-amber-400/40 group" data-cycle="superieur">
+            <span class="text-2xl">🎓</span>
+            <div class="mt-2 font-serif text-sm font-bold text-white group-hover:text-amber-300 transition">Supérieur & Recherche</div>
+            <div class="text-[11px] text-slate-400">L1/MPSI, L2/MP, L3/M1, M2/Agrégation</div>
+          </button>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section Bibliothèque & Filtres -->
+    <section id="librarySection" class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      
+      <!-- Barre des 5 Parcours / Cycles (Pills) -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
+        <button
+          type="button"
+          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 shadow-sm bg-slate-900 text-white"
+          data-cycle="all"
+        >
+          <span>Tous les Parcours</span>
+          <span class="cycle-count-tag rounded-full bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300">20</span>
+        </button>
+
+        <button
+          type="button"
+          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          data-cycle="primaire"
+        >
+          <span>🌱 Primaire (CP1 - CM2)</span>
+          <span class="cycle-count-tag rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">5</span>
+        </button>
+
+        <button
+          type="button"
+          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          data-cycle="college"
+        >
+          <span>📐 1er Cycle / Collège (6e - 3e)</span>
+          <span class="cycle-count-tag rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">5</span>
+        </button>
+
+        <button
+          type="button"
+          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          data-cycle="lycee"
+        >
+          <span>🔬 2nd Cycle / Lycée (2nde - Tle)</span>
+          <span class="cycle-count-tag rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">5</span>
+        </button>
+
+        <button
+          type="button"
+          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          data-cycle="superieur"
+        >
+          <span>🎓 Supérieur & Recherche (L1 - M2)</span>
+          <span class="cycle-count-tag rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">5</span>
+        </button>
+      </div>
+
+      <!-- Bloc des Filtres Avancés & Recherche -->
+      <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs space-y-4">
+        
+        <!-- Barre de recherche textuelle -->
+        <div class="relative">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+            <i data-lucide="search" class="h-4 w-4"></i>
+          </div>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher par titre, classe, leçon officielle, auteur, formule mathématique ou établissement..."
+            class="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-10 text-xs sm:text-sm font-medium text-slate-900 placeholder-slate-400 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600/20"
+          >
+          <button
+            type="button"
+            id="clearSearchBtn"
+            class="hidden absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-700"
+          >
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+        </div>
+
+        <!-- 4 Sélecteurs Cascadés : Classe, Leçon, Type, Domaine -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          
+          <!-- 1. Classe -->
+          <div>
+            <label for="filterGrade" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Classe / Niveau
+            </label>
+            <select
+              id="filterGrade"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition focus:border-indigo-600 focus:outline-none"
+            >
+              <option value="">Toutes les classes</option>
+            </select>
+          </div>
+
+          <!-- 2. Leçon Officielle du Programme -->
+          <div>
+            <label for="filterLesson" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Leçon Officielle (MENA)
+            </label>
+            <select
+              id="filterLesson"
+              disabled
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition focus:border-indigo-600 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400"
+            >
+              <option value="">Toutes les leçons du programme</option>
+            </select>
+          </div>
+
+          <!-- 3. Type de Ressource -->
+          <div>
+            <label for="filterType" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Type de Ressource
+            </label>
+            <select
+              id="filterType"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition focus:border-indigo-600 focus:outline-none"
+            >
+              <option value="all">Tous les types</option>
+              <option value="cours">Cours Magistral</option>
+              <option value="exercices">Fiche TD / Exercices</option>
+              <option value="devoir">Devoir Surveillé</option>
+              <option value="examen_blanc">Examen Blanc Régional</option>
+              <option value="concours">Concours & Olympiades</option>
+              <option value="livre_manuel">Manuel / Recueil</option>
+            </select>
+          </div>
+
+          <!-- 4. Domaine Mathématique -->
+          <div>
+            <label for="filterDomain" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Domaine Mathématique
+            </label>
+            <select
+              id="filterDomain"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition focus:border-indigo-600 focus:outline-none"
+            >
+              <option value="all">Tous les domaines</option>
+              <option value="Éveil & Numération">Éveil & Numération (Primaire)</option>
+              <option value="Arithmétique & Algèbre">Arithmétique & Algèbre</option>
+              <option value="Géométrie & Trigonométrie">Géométrie & Trigonométrie</option>
+              <option value="Analyse & Fonctions">Analyse & Fonctions</option>
+              <option value="Probabilités & Statistiques">Probabilités & Statistiques</option>
+              <option value="Algèbre Linéaire">Algèbre Linéaire</option>
+              <option value="Topologie & Calcul Différentiel">Topologie & Calcul Différentiel</option>
+              <option value="Physique-Mathématiques">Physique-Mathématiques</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Barre des filtres actifs & Bouton Réinitialiser -->
+        <div id="activeFiltersBar" class="hidden pt-2 border-t border-slate-100"></div>
+
+      </div>
+
+      <!-- En-tête des résultats : Compteur & Tri -->
+      <div class="mt-8 flex items-center justify-between">
+        <h2 id="docCountBadge" class="font-serif text-lg font-bold text-slate-900">
+          Documents Répertoriés (20)
+        </h2>
+        
+        <button
+          type="button"
+          id="btnResetFilters"
+          class="text-xs font-bold text-indigo-700 hover:text-indigo-900 transition flex items-center gap-1"
+        >
+          <i data-lucide="rotate-ccw" class="h-3.5 w-3.5"></i>
+          <span>Réinitialiser les filtres</span>
+        </button>
+      </div>
+
+      <!-- Grille des Cartes de Documents (Injectée par JS) -->
+      <div id="documentsGrid" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+      <!-- État vide si aucun document ne correspond aux filtres -->
+      <div id="emptyState" class="hidden text-center py-16 rounded-3xl border border-dashed border-slate-300 bg-white mt-6">
+        <div class="h-16 w-16 mx-auto flex items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3">
+          <i data-lucide="file-question" class="h-8 w-8"></i>
+        </div>
+        <h3 class="font-serif text-lg font-bold text-slate-800">Aucun document ne correspond à vos filtres</h3>
+        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          Essayez d'élargir votre recherche, de sélectionner un autre parcours ou de réinitialiser vos critères de sélection.
+        </p>
+        <button
+          type="button"
+          onclick="resetAllFilters()"
+          class="mt-4 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-indigo-600 transition"
+        >
+          <i data-lucide="rotate-ccw" class="h-3.5 w-3.5"></i> Réinitialiser tous les filtres
+        </button>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- VUE 2 : LA FORMATION LATEX (2E COHORTE) - PR. SALIOU TOURÉ                 -->
+  <!-- ========================================================================= -->
+  <section id="viewTraining" class="hidden flex-1 pb-16">
+    
+    <!-- Hero Formation -->
+    <div class="border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white py-12 sm:py-16">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+        
+        <div class="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-xs font-bold text-amber-300 backdrop-blur-md mb-6">
+          <i data-lucide="award" class="h-4 w-4"></i>
+          <span>Session de Formation Pratique Intensive aux Logiciels LaTeX & TikZ</span>
+        </div>
+
+        <h1 class="font-serif text-3xl sm:text-5xl font-black tracking-tight text-white max-w-3xl mx-auto leading-tight">
+          Apprenez à Rédiger des Documents Mathématiques d'Excellence
+        </h1>
+
+        <p class="mt-4 max-w-2xl mx-auto text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
+          18 heures de formation 100% pratique pour les professeurs de collèges, lycées et étudiants d'université. Maîtrisez la syntaxe LaTeX, les formules complexes, les figures géométriques TikZ et la mise en page des examens officiels.
+        </p>
+
+        <!-- Parrainage Scientifique & Pr. Saliou Touré -->
+        <div class="mt-8 inline-flex items-center gap-4 rounded-2xl border border-white/15 bg-white/5 px-6 py-3.5 text-left backdrop-blur-md">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500 font-serif text-xl font-bold text-slate-950">
+            ST
+          </div>
+          <div>
+            <div class="text-xs font-bold text-amber-300 uppercase tracking-wider">Sous l'égide scientifique de</div>
+            <div class="font-serif text-sm font-bold text-white">Pr. Saliou TOURÉ</div>
+            <div class="text-[11px] text-slate-400">Président de la Société Mathématique de Côte d'Ivoire (SMCI)</div>
+          </div>
+        </div>
+
+        <!-- Boutons d'inscription -->
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+          <a
+            href="https://forms.gle/2sPqT34ESzQR1S5L7"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 rounded-2xl bg-amber-500 px-6 py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 transition hover:bg-amber-400"
+          >
+            <i data-lucide="file-check" class="h-4 w-4"></i>
+            <span>S'inscrire Gratuitement à la 2ᵉ Cohorte (Google Form)</span>
+          </a>
+
+          <a
+            href="https://chat.whatsapp.com/D3Z48FSKgQT57ZA9lqLdJh?mode=gi_t"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 rounded-2xl border border-emerald-500 bg-emerald-600/20 px-6 py-3 text-xs sm:text-sm font-bold text-emerald-300 backdrop-blur-md transition hover:bg-emerald-600 hover:text-white"
+          >
+            <i data-lucide="message-circle" class="h-4 w-4"></i>
+            <span>Groupe WhatsApp Officiel Formation</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Programme Détaillé des 5 Modules -->
+    <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 space-y-10">
+      
+      <div class="text-center">
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+          Syllabus Pédagogique des 18 Heures
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1">
+          Une méthode progressive conçue pour passer de débutant à expert autonome.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- Module 1 -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-indigo-50 text-indigo-700 px-2.5 py-1 text-xs font-bold border border-indigo-200">
+              Module 1 • 3h
+            </span>
+            <i data-lucide="terminal" class="h-5 w-5 text-indigo-600"></i>
+          </div>
+          <h3 class="font-serif text-base font-bold text-slate-900">Environnement & Syntaxe Fondamentale</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>• Installation de TeX Live, MiKTeX, TeXstudio et Overleaf</li>
+            <li>• Structure d'un préambule officiel MENA (articles, examens)</li>
+            <li>• Gestion des accents, des polices et des marges A4</li>
+          </ul>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-emerald-50 text-emerald-700 px-2.5 py-1 text-xs font-bold border border-emerald-200">
+              Module 2 • 4h
+            </span>
+            <i data-lucide="binary" class="h-5 w-5 text-emerald-600"></i>
+          </div>
+          <h3 class="font-serif text-base font-bold text-slate-900">Formules Mathématiques, Matrices & Systèmes</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>• Les environnements amsmath, align, multline et gather</li>
+            <li>• Fractions, radicaux, intégrales, sommes et limites</li>
+            <li>• Systèmes d'équations avec accolades et matrices de grande taille</li>
+          </ul>
+        </div>
+
+        <!-- Module 3 -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-amber-50 text-amber-800 px-2.5 py-1 text-xs font-bold border border-amber-200">
+              Module 3 • 5h
+            </span>
+            <i data-lucide="pen-tool" class="h-5 w-5 text-amber-600"></i>
+          </div>
+          <h3 class="font-serif text-base font-bold text-slate-900">Figures Vectorielles avec TikZ & PGFPlots</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>• Tracé de triangles, cercles inscrits et configurations géométriques</li>
+            <li>• Courbes de fonctions, asymptotes et tangentes de classe de Terminale</li>
+            <li>• Tableaux de variations avec le package tkz-tab</li>
+          </ul>
+        </div>
+
+        <!-- Module 4 -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-blue-50 text-blue-700 px-2.5 py-1 text-xs font-bold border border-blue-200">
+              Module 4 • 3h
+            </span>
+            <i data-lucide="presentation" class="h-5 w-5 text-blue-600"></i>
+          </div>
+          <h3 class="font-serif text-base font-bold text-slate-900">Présentations Beamer & Diaporamas</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>• Création de diaporamas scientifiques avec la classe Beamer</li>
+            <li>• Blocs théorèmes, définitions et animations étape par étape</li>
+            <li>• Projection en classe et soutenance de mémoires de recherche</li>
+          </ul>
+        </div>
+
+        <!-- Module 5 -->
+        <div class="col-span-1 md:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-purple-50 text-purple-700 px-2.5 py-1 text-xs font-bold border border-purple-200">
+              Module 5 • 3h
+            </span>
+            <i data-lucide="sparkles" class="h-5 w-5 text-purple-600"></i>
+          </div>
+          <h3 class="font-serif text-base font-bold text-slate-900">Production d'Examens Types & Conversion Word</h3>
+          <p class="text-xs text-slate-600 mt-2">
+            Automatisez la création de vos épreuves avec barème en marge, gestion des corrigés masqués ou affichés, et export bidirectionnel vers Word via Pandoc.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Villes des Ateliers en Présentiel -->
+      <div class="rounded-3xl border border-slate-200 bg-indigo-50/50 p-6 sm:p-8 text-center">
+        <h3 class="font-serif text-lg font-bold text-indigo-950">
+          Ateliers Déployés dans 6 Pôles Universitaires & Régionaux
+        </h3>
+        <p class="text-xs text-indigo-800 mt-1 max-w-xl mx-auto">
+          Les sessions sont dispensées simultanément en présentiel et retransmises en direct sur Zoom et YouTube.
+        </p>
+
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs font-bold">
+          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">📍 Abidjan (UFHB Cocody & ENS)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">📍 Yamoussoukro (INP-HB)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">📍 Bouaké (Alassane Ouattara)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">📍 Korhogo (Péléforo Gon Coulibaly)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">📍 Daloa (Jean Lorougnon Guédé)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">📍 San-Pédro (Université de San-Pédro)</span>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- PIED DE PAGE (Footer)                                                     -->
+  <!-- ========================================================================= -->
+  <footer class="border-t border-slate-200 bg-white py-12 text-slate-600">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        
+        <!-- Colonne 1 : Brand & Mission -->
+        <div class="col-span-1 md:col-span-2 space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-900 text-white font-serif text-xl font-bold">
+              M
+            </div>
+            <span class="font-serif text-lg font-black text-slate-900">MATEX</span>
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed max-w-md">
+            Plateforme nationale d'émulation et de mutualisation pédagogique des mathématiques en Côte d'Ivoire. Du CP1 à l'agrégation, nous offrons aux enseignants et apprenants des outils typographiques de niveau international.
+          </p>
+          <div class="flex items-center gap-3 pt-2">
+            <a
+              href="https://docs.google.com/spreadsheets/d/100kYZ-lrTW069edLrur_RBfqxsvu288jeES5zQ-tZTI/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800"
+            >
+              <i data-lucide="table" class="h-3.5 w-3.5"></i> Registre Google Sheets
+            </a>
+            <span class="text-slate-300">•</span>
+            <a
+              href="https://drive.google.com/drive/folders/1jWAn2ZHD4vU8NAypKcsXI5Ias8oIZFYF?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800"
+            >
+              <i data-lucide="folder" class="h-3.5 w-3.5"></i> Dossier Google Drive
+            </a>
+          </div>
+        </div>
+
+        <!-- Colonne 2 : Parcours -->
+        <div>
+          <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-slate-900 mb-3">
+            Parcours Scolaires & Universitaires
+          </h4>
+          <ul class="space-y-2 text-xs">
+            <li><button type="button" class="hover:text-indigo-600 transition" onclick="setCycleFilter('primaire')">🌱 Enseignement Primaire (CP1 - CM2)</button></li>
+            <li><button type="button" class="hover:text-indigo-600 transition" onclick="setCycleFilter('college')">📐 1er Cycle / Collège (6e - 3e)</button></li>
+            <li><button type="button" class="hover:text-indigo-600 transition" onclick="setCycleFilter('lycee')">🔬 2nd Cycle / Lycée (2nde - Tle)</button></li>
+            <li><button type="button" class="hover:text-indigo-600 transition" onclick="setCycleFilter('superieur')">🎓 Supérieur & Recherche (L1 - M2)</button></li>
+          </ul>
+        </div>
+
+        <!-- Colonne 3 : Soutien & Dons -->
+        <div>
+          <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-slate-900 mb-3">
+            Soutien & Contribution
+          </h4>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Association MATEX Côte d'Ivoire.<br>
+            Donations Wave / Orange Money :<br>
+            <strong class="text-slate-800">07 48 78 22 05</strong><br>
+            <span class="text-[10px] text-slate-400">Titulaire : KABLAM EDJABROU ULRICH BLANCHARD</span>
+          </p>
+          <button
+            type="button"
+            onclick="openDonateModal()"
+            class="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-950 hover:bg-amber-400 transition"
+          >
+            <i data-lucide="heart" class="h-3 w-3 fill-slate-950"></i> Faire un Don Solidaire
+          </button>
+        </div>
+
+      </div>
+
+      <div class="mt-10 border-t border-slate-100 pt-6 text-center text-[11px] text-slate-400">
+        © 2026 MATEX Côte d'Ivoire. Tous droits réservés. Développé pour la communauté éducative nationale.
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 1 : VISIONNEUSE DE DOCUMENT (DocumentViewerModal)                   -->
+  <!-- ========================================================================= -->
+  <div id="modalDocumentViewer" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-5xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl flex flex-col max-h-[96vh] overflow-hidden">
+      
+      <!-- Top Bar de la visionneuse -->
+      <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3 bg-slate-950 text-white">
+        
+        <div class="flex items-center gap-3 overflow-hidden">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white font-serif font-bold text-sm">
+            PDF
+          </div>
+          <div class="truncate">
+            <h3 id="viewerModalTitle" class="font-serif text-xs sm:text-sm font-bold truncate text-white">
+              Titre du Document
+            </h3>
+            <p id="viewerModalMeta" class="text-[10px] sm:text-[11px] text-slate-400 truncate">
+              Classe • Chapitre • Auteur
+            </p>
+          </div>
+        </div>
+
+        <!-- 2 Onglets Dédiés : Aperçu PDF Réel / Source LaTeX (.tex) -->
+        <div class="flex items-center gap-1 rounded-xl bg-slate-900 p-1 text-xs font-bold border border-slate-800">
+          <button type="button" id="viewerTabPdf" class="rounded-lg px-3 py-1.5 transition bg-white text-slate-900 shadow-xs flex items-center gap-1.5">
+            <i data-lucide="file-text" class="h-3.5 w-3.5 text-rose-500"></i>
+            <span>Aperçu PDF Réel</span>
+          </button>
+          <button type="button" id="viewerTabLatex" class="rounded-lg px-3 py-1.5 transition text-slate-400 hover:text-white flex items-center gap-1.5">
+            <i data-lucide="file-code" class="h-3.5 w-3.5 text-emerald-400"></i>
+            <span>Source LaTeX (.tex)</span>
+          </button>
+        </div>
+
+        <!-- Boutons d'Action Rapide Dédiés (.pdf & .tex) -->
+        <div class="hidden md:flex items-center gap-1.5">
+          <button
+            type="button"
+            id="btnViewerQuickDownloadPdf"
+            class="inline-flex items-center gap-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-2.5 py-1 text-xs font-bold transition"
+            title="Télécharger le fichier PDF"
+          >
+            <i data-lucide="download" class="h-3 w-3"></i> .PDF
+          </button>
+          <button
+            type="button"
+            id="btnViewerQuickDownloadTex"
+            class="inline-flex items-center gap-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 text-xs font-bold transition"
+            title="Télécharger le code source LaTeX (.tex)"
+          >
+            <i data-lucide="download" class="h-3 w-3"></i> .TEX
+          </button>
+        </div>
+
+        <!-- Contrôles Zoom & Fermer -->
+        <div class="flex items-center gap-1.5">
+          <button type="button" id="btnViewerZoomOut" class="h-8 w-8 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 flex items-center justify-center text-xs transition" title="Zoom Arrière">
+            <i data-lucide="zoom-out" class="h-4 w-4"></i>
+          </button>
+          <span id="viewerZoomLevel" class="text-[11px] font-mono font-bold text-slate-400 px-1">100%</span>
+          <button type="button" id="btnViewerZoomIn" class="h-8 w-8 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 flex items-center justify-center text-xs transition" title="Zoom Avant">
+            <i data-lucide="zoom-in" class="h-4 w-4"></i>
+          </button>
+          <button type="button" id="btnViewerZoomReset" class="h-8 w-8 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 flex items-center justify-center text-xs transition hidden sm:flex" title="Réinitialiser Zoom">
+            <i data-lucide="maximize" class="h-3.5 w-3.5"></i>
+          </button>
+          <button type="button" id="btnViewerPrint" class="h-8 w-8 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 flex items-center justify-center text-xs transition" title="Imprimer le document">
+            <i data-lucide="printer" class="h-4 w-4"></i>
+          </button>
+          <a
+            id="btnViewerOpenDrive"
+            href="https://drive.google.com/drive/folders/1jWAn2ZHD4vU8NAypKcsXI5Ias8oIZFYF?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="h-8 px-2.5 rounded-lg bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 flex items-center justify-center text-xs font-semibold gap-1 transition"
+            title="Ouvrir dans Google Drive"
+          >
+            <i data-lucide="folder" class="h-3.5 w-3.5"></i>
+            <span class="hidden md:inline">Drive</span>
+          </a>
+          <button type="button" id="btnCloseDocumentViewer" class="h-8 w-8 rounded-lg bg-red-950/60 hover:bg-red-900 text-red-300 flex items-center justify-center text-xs transition ml-1" title="Fermer">
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Corps de la visionneuse avec défilement -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-900/50">
+        
+        <!-- Contenu 1 : Feuille A4 Authentique (PDF) -->
+        <div id="viewerContentPdf">
+          <div id="authenticA4Sheet" class="a4-paper-sheet animate-scale-in"></div>
+        </div>
+
+        <!-- Contenu 2 : Code Source LaTeX (.tex) -->
+        <div id="viewerContentLatex" class="hidden"></div>
+
+        <!-- Contenu 3 : Conversion Word (.docx) -->
+        <div id="viewerContentDocx" class="hidden"></div>
+
+      </div>
+
+      <!-- Bannière inférieure de déblocage rapide -->
+      <div class="border-t border-slate-800 bg-slate-950 p-3 text-center flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sparkles" class="h-4 w-4 text-amber-400"></i>
+          <span>Besoin des fichiers sources complets <strong>.tex</strong> et <strong>.docx</strong> de cette ressource ?</span>
+        </div>
+        <button
+          type="button"
+          id="btnViewerBannerUnlock"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-sm transition hover:bg-amber-400"
+        >
+          <span>Débloquer l'accès complet</span>
+          <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2 : PASSERELLE DE DÉBLOCAGE (UnlockGatewayModal)                    -->
+  <!-- ========================================================================= -->
+  <div id="modalUnlockGateway" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in">
+      
+      <!-- Bouton fermer -->
+      <button
+        type="button"
+        id="btnCloseUnlockGateway"
+        class="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition"
+      >
+        <i data-lucide="x" class="h-4 w-4"></i>
+      </button>
+
+      <div class="text-center">
+        <div class="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 shadow-2xs mb-3">
+          <i data-lucide="unlock" class="h-7 w-7"></i>
+        </div>
+        <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
+          Débloquer les Fichiers Sources
+        </h3>
+        <p id="unlockDocTitle" class="text-xs text-indigo-700 font-bold mt-1">
+          Ressource sélectionnée
+        </p>
+        <p class="text-xs text-slate-600 mt-2 max-w-md mx-auto leading-relaxed">
+          Pour maintenir cette plateforme libre, gratuite et accessible à tous les enseignants et étudiants ivoiriens, choisissez l'une des 2 options d'accès :
+        </p>
+      </div>
+
+      <!-- 2 Choix : Gratuit Communauté vs Don Solidaire -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        <!-- Option 1 : Rejoindre la Communauté MATEX (Gratuit) -->
+        <div class="flex flex-col justify-between rounded-2xl border-2 border-emerald-500 bg-emerald-50/40 p-5 text-left">
+          <div>
+            <span class="rounded-md bg-emerald-600 text-white px-2 py-0.5 text-[10px] font-extrabold uppercase">
+              100% Gratuit
+            </span>
+            <h4 class="font-serif font-bold text-sm text-slate-900 mt-2">
+              Rejoindre MATEX
+            </h4>
+            <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
+              Intégrez le groupe WhatsApp national des enseignants et recevez les codes sources partagés par la communauté.
+            </p>
+          </div>
+          <button
+            type="button"
+            id="btnUnlockGoJoin"
+            class="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
+          >
+            <i data-lucide="users" class="h-3.5 w-3.5"></i>
+            <span>Intégrer le Réseau</span>
+          </button>
+        </div>
+
+        <!-- Option 2 : Faire un Don Solidaire (Wave / Orange Money) -->
+        <div class="flex flex-col justify-between rounded-2xl border-2 border-amber-500 bg-amber-50/40 p-5 text-left">
+          <div>
+            <span class="rounded-md bg-amber-500 text-slate-950 px-2 py-0.5 text-[10px] font-extrabold uppercase">
+              Soutien Pédagogique
+            </span>
+            <h4 class="font-serif font-bold text-sm text-slate-900 mt-2">
+              Faire un Don Solidaire
+            </h4>
+            <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
+              Dès 5 000 FCFA via Wave / Orange Money au <strong>07 48 78 22 05</strong> pour soutenir l'hébergement et la rédaction.
+            </p>
+          </div>
+          <button
+            type="button"
+            id="btnUnlockGoDonate"
+            class="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl bg-amber-500 py-2.5 text-xs font-bold text-slate-950 shadow-xs hover:bg-amber-400 transition"
+          >
+            <i data-lucide="heart" class="h-3.5 w-3.5 fill-slate-950"></i>
+            <span>Faire un Don (Dès 5 000 F)</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 3 : DON SOLIDAIRE (DonateModal) - WAVE / ORANGE MONEY 07 48 78 22 05-->
+  <!-- ========================================================================= -->
+  <div id="modalDonate" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in">
+      
+      <!-- Bouton fermer -->
+      <button
+        type="button"
+        id="btnCloseDonate"
+        class="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition"
+      >
+        <i data-lucide="x" class="h-4 w-4"></i>
+      </button>
+
+      <!-- Section 1 : Formulaire de Don -->
+      <div id="donateFormSection">
+        <div class="text-center">
+          <div class="flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 shadow-2xs mb-2">
+            <i data-lucide="heart" class="h-6 w-6 fill-amber-500 text-amber-500"></i>
+          </div>
+          <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
+            Soutenez la Communauté MATEX
+          </h3>
+          <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            Vos dons permettent de financer les formations gratuites en province, les polycopiés et l'hébergement des serveurs.
+          </p>
+        </div>
+
+        <form id="formDonateSubmission" class="mt-6 space-y-4">
+          
+          <!-- Paliers de dons prédéfinis -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-2">
+              Choisissez votre palier solidaire (FCFA) :
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" class="donate-tier-btn rounded-xl border-2 border-amber-500 bg-amber-50/80 p-3 text-center text-xs font-bold text-amber-950 shadow-xs transition" data-tier="tier-1">
+                5 000 F
+              </button>
+              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition" data-tier="tier-2">
+                10 000 F
+              </button>
+              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition" data-tier="tier-3">
+                25 000 F
+              </button>
+              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition" data-tier="tier-4">
+                50 000 F
+              </button>
+            </div>
+
+            <!-- Montant personnalisé -->
+            <div class="mt-2.5">
+              <input
+                type="number"
+                id="donateCustomAmount"
+                min="5000"
+                step="1000"
+                placeholder="Ou saisir un autre montant (Min. 5 000 FCFA)..."
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 transition focus:border-amber-500 focus:bg-white focus:outline-none"
+              >
+            </div>
+
+            <!-- Description d'impact -->
+            <p id="donateImpactDesc" class="mt-2 text-[11px] text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-2.5 font-medium leading-relaxed">
+              Montant minimal solidaire (À partir de 5 000 FCFA) : Contribue à l'hébergement des sources LaTeX, aux connexions et à la logistique des ateliers.
+            </p>
+          </div>
+
+          <!-- Coordonnées Wave / Orange Money Officielles -->
+          <div class="rounded-2xl border-2 border-slate-900 bg-slate-900 text-white p-4 space-y-2">
+            <div class="flex items-center justify-between text-[11px] font-bold text-amber-400">
+              <span>DESTINATAIRE OFFICIEL DU COMPTE</span>
+              <span class="rounded bg-amber-500/20 px-2 py-0.5 text-amber-300 font-mono">WAVE / ORANGE</span>
+            </div>
+            
+            <div class="font-serif text-sm sm:text-base font-bold text-white tracking-wide">
+              KABLAM EDJABROU ULRICH BLANCHARD
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <div class="font-mono text-lg font-black text-amber-300">
+                07 48 78 22 05
+              </div>
+              <button
+                type="button"
+                id="btnCopyPhone"
+                class="flex items-center gap-1 rounded-lg bg-white/10 hover:bg-white/20 px-2.5 py-1 text-xs font-bold text-white transition"
+              >
+                <i data-lucide="copy" class="h-3.5 w-3.5"></i> Copier
+              </button>
+            </div>
+          </div>
+
+          <!-- Choix de l'opérateur utilisé -->
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              id="donateOpWave"
+              class="flex-1 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 p-3 text-center text-xs font-bold text-indigo-900 transition"
+            >
+              🌊 Don par Wave
+            </button>
+            <button
+              type="button"
+              id="donateOpOrange"
+              class="flex-1 rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+            >
+              🍊 Orange Money
+            </button>
+          </div>
+
+          <!-- Capture d'écran du reçu de transfert -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Capture d'écran du reçu de transfert (Preuve) :
+            </label>
+            
+            <div id="donateDropZone" class="cursor-pointer rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/70 p-4 text-center transition hover:border-amber-500 hover:bg-amber-50/20">
+              <i data-lucide="upload-cloud" class="h-6 w-6 mx-auto text-slate-400 mb-1"></i>
+              <p class="text-xs font-bold text-slate-700">Glissez le reçu ou cliquez pour sélectionner</p>
+              <p class="text-[10px] text-slate-400">PNG, JPG ou PDF jusqu'à 10 Mo</p>
+              <input type="file" id="donateProofInput" accept="image/*,application/pdf" class="hidden">
+            </div>
+
+            <div id="donateProofPreview" class="hidden mt-2 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs">
+              <div class="flex items-center gap-2 truncate">
+                <img id="donateProofImg" src="" alt="Aperçu du reçu" class="h-8 w-8 rounded object-cover border border-slate-200">
+                <span id="donateProofFileName" class="font-semibold text-slate-800 truncate">recu.png</span>
+              </div>
+              <button type="button" id="btnRemoveProof" class="text-red-600 hover:text-red-700 text-xs font-bold">
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <!-- Nom et Téléphone du Donateur -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="donateDonorName" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Votre Nom & Prénoms :
+              </label>
+              <input
+                type="text"
+                id="donateDonorName"
+                required
+                placeholder="Ex: Prof. Yao Koffi"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 transition focus:border-amber-500 focus:bg-white focus:outline-none"
+              >
+            </div>
+            <div>
+              <label for="donateDonorPhone" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Votre Numéro WhatsApp :
+              </label>
+              <input
+                type="tel"
+                id="donateDonorPhone"
+                required
+                placeholder="Ex: 07 00 00 00 00"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 transition focus:border-amber-500 focus:bg-white focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-md transition hover:from-amber-400 hover:to-amber-500"
+          >
+            Confirmer l'Envoi de mon Don Solidaire
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Section 2 : Confirmation de Don Réussi -->
+      <div id="donateSuccessSection" class="hidden text-center py-6 space-y-4">
+        <div class="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
+          <i data-lucide="check-circle" class="h-8 w-8"></i>
+        </div>
+        <h3 class="font-serif text-2xl font-black text-slate-900">
+          Infiniment Merci pour Votre Soutien !
+        </h3>
+        <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+          Votre don de <strong id="donateSuccessAmount" class="text-indigo-700">5 000 FCFA</strong> via <span id="donateSuccessOperator">Wave</span> a été enregistré avec succès et transmis à l'administration de MATEX.
+        </p>
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700 text-left space-y-1">
+          <div class="font-bold text-slate-900">Prochaine étape :</div>
+          <p>Un administrateur va valider votre reçu et vous transmettre l'accès complet par WhatsApp.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2 pt-2">
+          <a
+            href="https://chat.whatsapp.com/DRQEqCr4221L0bS2wXjgWU?mode=gi_t"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition flex items-center justify-center gap-1.5"
+          >
+            <i data-lucide="message-circle" class="h-4 w-4"></i> Rejoindre le Groupe WhatsApp
+          </a>
+          <button
+            type="button"
+            id="btnDonateSuccessFinish"
+            class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 4 : REJOINDRE LA COMMUNAUTÉ (JoinCommunityModal)                   -->
+  <!-- ========================================================================= -->
+  <div id="modalJoin" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in">
+      
+      <!-- Bouton fermer -->
+      <button
+        type="button"
+        id="btnCloseJoin"
+        class="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition"
+      >
+        <i data-lucide="x" class="h-4 w-4"></i>
+      </button>
+
+      <!-- Formulaire d'adhésion -->
+      <div id="joinFormSection">
+        <div class="text-center">
+          <div class="flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs mb-2">
+            <i data-lucide="users" class="h-6 w-6"></i>
+          </div>
+          <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
+            Rejoindre la Communauté Nationale MATEX
+          </h3>
+          <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            Rejoignez plus de 1 200 enseignants de mathématiques et passionnés de LaTeX de toute la Côte d'Ivoire.
+          </p>
+        </div>
+
+        <form id="formJoinMember" class="mt-6 space-y-4">
+          
+          <div>
+            <label for="joinFullName" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Nom et Prénoms complets :
+            </label>
+            <input
+              type="text"
+              id="joinFullName"
+              required
+              placeholder="Ex: Dr. Kouamé Jean-Baptiste"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none"
+            >
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="joinPhone" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Numéro WhatsApp :
+              </label>
+              <input
+                type="tel"
+                id="joinPhone"
+                required
+                placeholder="Ex: 07 48 78 22 05"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none"
+              >
+            </div>
+            <div>
+              <label for="joinEmail" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Adresse Email :
+              </label>
+              <input
+                type="email"
+                id="joinEmail"
+                required
+                placeholder="Ex: prof@education.ci"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="joinInstitution" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Établissement / Université :
+              </label>
+              <input
+                type="text"
+                id="joinInstitution"
+                required
+                placeholder="Ex: Lycée Classique d'Abidjan"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none"
+              >
+            </div>
+            <div>
+              <label for="joinCity" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Ville de Résidence :
+              </label>
+              <input
+                type="text"
+                id="joinCity"
+                required
+                placeholder="Ex: Abidjan, Yamoussoukro, Bouaké..."
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <!-- Niveaux enseignés (Cases à cocher) -->
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1.5">
+              Niveaux d'enseignement (plusieurs choix possibles) :
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <label class="flex items-center gap-1.5 rounded-lg border border-slate-200 p-2 hover:bg-slate-50 cursor-pointer">
+                <input type="checkbox" name="teachingLevel" value="Primaire" class="rounded text-indigo-600">
+                <span>🌱 Primaire</span>
+              </label>
+              <label class="flex items-center gap-1.5 rounded-lg border border-slate-200 p-2 hover:bg-slate-50 cursor-pointer">
+                <input type="checkbox" name="teachingLevel" value="Collège" class="rounded text-indigo-600">
+                <span>📐 Collège</span>
+              </label>
+              <label class="flex items-center gap-1.5 rounded-lg border border-slate-200 p-2 hover:bg-slate-50 cursor-pointer">
+                <input type="checkbox" name="teachingLevel" value="Lycée" class="rounded text-indigo-600" checked>
+                <span>🔬 Lycée</span>
+              </label>
+              <label class="flex items-center gap-1.5 rounded-lg border border-slate-200 p-2 hover:bg-slate-50 cursor-pointer">
+                <input type="checkbox" name="teachingLevel" value="Supérieur" class="rounded text-indigo-600">
+                <span>🎓 Supérieur</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Niveau de maîtrise LaTeX -->
+          <div>
+            <label for="joinLatexLevel" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Votre niveau actuel en LaTeX :
+            </label>
+            <select
+              id="joinLatexLevel"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 transition focus:border-emerald-600 focus:outline-none"
+            >
+              <option value="debutant">Grand Débutant (Jamais utilisé LaTeX)</option>
+              <option value="intermediaire">Intermédiaire (Je sais compiler des formules)</option>
+              <option value="avance">Avancé (Je maîtrise TikZ et les packages complexes)</option>
+              <option value="formateur">Expert / Souhaite devenir Formateur MATEX</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full rounded-2xl bg-emerald-600 py-3 text-xs sm:text-sm font-bold text-white shadow-md transition hover:bg-emerald-700"
+          >
+            Valider mon Inscription Gratuite à MATEX
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Section Confirmation Adhésion Réussie -->
+      <div id="joinSuccessSection" class="hidden text-center py-6 space-y-4">
+        <div class="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
+          <i data-lucide="check-circle" class="h-8 w-8"></i>
+        </div>
+        <h3 class="font-serif text-2xl font-black text-slate-900">
+          Bienvenue dans la Famille MATEX !
+        </h3>
+        <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+          Félicitations <strong id="joinSuccessName">Professeur</strong>, votre profil a été enregistré. Cliquez ci-dessous pour rejoindre directement le groupe WhatsApp national officiel :
+        </p>
+
+        <a
+          href="https://chat.whatsapp.com/DRQEqCr4221L0bS2wXjgWU?mode=gi_t"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-emerald-700 transition"
+        >
+          <i data-lucide="message-circle" class="h-5 w-5"></i>
+          <span>Rejoindre le Groupe WhatsApp National</span>
+        </a>
+
+        <div>
+          <button
+            type="button"
+            id="btnJoinSuccessFinish"
+            class="text-xs text-slate-400 hover:text-slate-700 underline font-semibold mt-4"
+          >
+            Fermer la fenêtre
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 5 : DÉPOSER UN DOCUMENT (SubmitDocumentModal)                       -->
+  <!-- ========================================================================= -->
+  <div id="modalSubmit" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-3xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in max-h-[94vh] overflow-y-auto">
+      
+      <!-- Bouton fermer -->
+      <button
+        type="button"
+        id="btnCloseSubmit"
+        class="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition"
+      >
+        <i data-lucide="x" class="h-4 w-4"></i>
+      </button>
+
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+        <div>
+          <h3 class="font-serif text-xl font-bold text-slate-900">Déposer une Ressource Pédagogique</h3>
+          <p class="text-xs text-slate-500">Partagez vos devoirs, cours, corrigés et fichiers LaTeX avec la communauté.</p>
+        </div>
+
+        <div class="flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-xs font-bold border border-slate-200">
+          <button type="button" id="btnSubmitTabForm" class="rounded-lg px-3 py-1.5 transition bg-white text-slate-900 shadow-xs">
+            Formulaire de Dépôt
+          </button>
+          <button type="button" id="btnSubmitTabCurriculum" class="rounded-lg px-3 py-1.5 transition text-slate-600 hover:text-slate-900">
+            Référentiel des Leçons
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenu Onglet 1 : Formulaire de Dépôt -->
+      <div id="submitTabContentForm">
+        <form id="formSubmitDocument" class="space-y-4">
+          
+          <!-- Ligne 1 : Parcours, Classe et Leçon Cascadés -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label for="submitCycle" class="block text-[11px] font-bold text-slate-700 mb-1">
+                1. Parcours Scolaire :
+              </label>
+              <select id="submitCycle" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800">
+                <option value="primaire">🌱 Primaire (CP1 - CM2)</option>
+                <option value="college" selected>📐 1er Cycle / Collège (6e - 3e)</option>
+                <option value="lycee">🔬 2nd Cycle / Lycée (2nde - Tle)</option>
+                <option value="superieur">🎓 Supérieur & Recherche (L1 - M2)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="submitGrade" class="block text-[11px] font-bold text-slate-700 mb-1">
+                2. Classe :
+              </label>
+              <select id="submitGrade" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800"></select>
+            </div>
+
+            <div>
+              <label for="submitLesson" class="block text-[11px] font-bold text-slate-700 mb-1">
+                3. Leçon Officielle MENA :
+              </label>
+              <select id="submitLesson" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800"></select>
+            </div>
+          </div>
+
+          <!-- Ligne 2 : Titre du Document -->
+          <div>
+            <label for="submitTitle" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Titre complet de la ressource :
+            </label>
+            <input
+              type="text"
+              id="submitTitle"
+              required
+              placeholder="Ex: Devoir Surveillé N°1 : Nombres Complexes et Similitudes Directes"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-900 transition focus:border-indigo-600 focus:bg-white focus:outline-none"
+            >
+          </div>
+
+          <!-- Ligne 3 : Type & Domaine -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="submitType" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Type de Document :
+              </label>
+              <select id="submitType" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800">
+                <option value="cours">Cours Magistral</option>
+                <option value="exercices">Fiche TD / Exercices</option>
+                <option value="devoir" selected>Devoir Surveillé</option>
+                <option value="examen_blanc">Examen Blanc Régional</option>
+                <option value="concours">Concours & Olympiades</option>
+                <option value="livre_manuel">Manuel / Recueil</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="submitDomain" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Domaine Mathématique :
+              </label>
+              <select id="submitDomain" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800">
+                <option value="Arithmétique & Algèbre">Arithmétique & Algèbre</option>
+                <option value="Géométrie & Trigonométrie">Géométrie & Trigonométrie</option>
+                <option value="Analyse & Fonctions" selected>Analyse & Fonctions</option>
+                <option value="Probabilités & Statistiques">Probabilités & Statistiques</option>
+                <option value="Algèbre Linéaire">Algèbre Linéaire</option>
+                <option value="Topologie & Calcul Différentiel">Topologie & Calcul Différentiel</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Ligne 4 : Auteur & Établissement -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="submitAuthorName" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Nom & Prénoms de l'enseignant :
+              </label>
+              <input
+                type="text"
+                id="submitAuthorName"
+                required
+                placeholder="Ex: Prof. Amadou Koné"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900"
+              >
+            </div>
+
+            <div>
+              <label for="submitInstitution" class="block text-[11px] font-bold text-slate-700 mb-1">
+                Établissement d'origine :
+              </label>
+              <input
+                type="text"
+                id="submitInstitution"
+                required
+                placeholder="Ex: Lycée Scientifique de Yamoussoukro"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900"
+              >
+            </div>
+          </div>
+
+          <!-- Ligne 5 : Fichiers Dédiés (.PDF et .TEX uniquement) avec Synchronisation Google Drive -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block text-[11px] font-bold text-slate-800">
+                Fichiers de la Ressource <span class="text-rose-600 font-extrabold">(.pdf et .tex uniquement)</span> :
+              </label>
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <i data-lucide="shield-check" class="h-3 w-3 text-emerald-600"></i> Standard National MATEX
+              </span>
+            </div>
+
+            <!-- Bannière d'instruction claire -->
+            <div class="rounded-xl border border-indigo-100 bg-indigo-50/50 p-2.5 text-[11px] text-indigo-900 flex items-start gap-2">
+              <i data-lucide="info" class="h-4 w-4 text-indigo-600 shrink-0 mt-0.5"></i>
+              <p class="leading-relaxed">
+                Déposez séparément votre <strong>fichier PDF (.pdf)</strong> pour la consultation et l'impression authentique et/ou votre <strong>source LaTeX (.tex)</strong> pour le partage du code éditable.
+              </p>
+            </div>
+
+            <!-- Deux Cartes de Sélection Séparées (.PDF et .TEX) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
+              <!-- 1. Fichier PDF (.pdf) -->
+              <div id="submitPdfDropZone" class="rounded-2xl border-2 border-dashed border-rose-200 bg-rose-50/30 hover:border-rose-400 hover:bg-rose-50/60 p-3.5 space-y-2.5 shadow-2xs transition">
+                <div class="flex items-center justify-between">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                    <span class="flex h-5 w-5 items-center justify-center rounded-md bg-rose-600 text-white text-[10px] font-bold">PDF</span>
+                    Fichier PDF (.pdf)
+                  </span>
+                  <span class="text-[10px] font-semibold text-rose-600 bg-rose-100/70 px-1.5 py-0.5 rounded">Rendu final</span>
+                </div>
+
+                <div id="submitPdfEmptyState" class="space-y-1.5 text-center">
+                  <label for="submitPdfInput" class="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-300 bg-white hover:bg-rose-50 text-rose-700 py-2.5 px-3 text-xs font-bold cursor-pointer transition shadow-2xs">
+                    <i data-lucide="file-up" class="h-4 w-4"></i>
+                    <span>Choisir le fichier .pdf</span>
+                  </label>
+                  <p class="text-[10px] text-slate-400 font-medium">ou glissez-déposez le fichier .pdf ici</p>
+                  <input type="file" id="submitPdfInput" accept=".pdf" class="hidden">
+                </div>
+
+                <div id="submitPdfSelectedState" class="hidden flex items-center justify-between rounded-xl border border-rose-200 bg-white p-2.5 text-xs shadow-2xs">
+                  <div class="flex items-center gap-2 truncate">
+                    <i data-lucide="check-circle" class="h-4 w-4 text-rose-600 shrink-0"></i>
+                    <div class="truncate">
+                      <p id="submitPdfName" class="font-bold text-slate-900 truncate text-[11px]">document.pdf</p>
+                      <p id="submitPdfSize" class="text-[10px] text-slate-500 font-mono">0 KB</p>
+                    </div>
+                  </div>
+                  <button type="button" id="btnRemovePdf" class="text-rose-700 hover:text-rose-900 text-[11px] font-bold px-1.5 py-0.5 hover:underline">
+                    Retirer
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2. Fichier Source LaTeX (.tex) -->
+              <div id="submitTexDropZone" class="rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/30 hover:border-emerald-400 hover:bg-emerald-50/60 p-3.5 space-y-2.5 shadow-2xs transition">
+                <div class="flex items-center justify-between">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                    <span class="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-600 text-white text-[10px] font-bold">TEX</span>
+                    Source LaTeX (.tex)
+                  </span>
+                  <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-100/70 px-1.5 py-0.5 rounded">Code éditable</span>
+                </div>
+
+                <div id="submitTexEmptyState" class="space-y-1.5 text-center">
+                  <label for="submitTexInput" class="w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-700 py-2.5 px-3 text-xs font-bold cursor-pointer transition shadow-2xs">
+                    <i data-lucide="code" class="h-4 w-4"></i>
+                    <span>Choisir le fichier .tex</span>
+                  </label>
+                  <p class="text-[10px] text-slate-400 font-medium">ou glissez-déposez le fichier .tex ici</p>
+                  <input type="file" id="submitTexInput" accept=".tex" class="hidden">
+                </div>
+
+                <div id="submitTexSelectedState" class="hidden flex items-center justify-between rounded-xl border border-emerald-200 bg-white p-2.5 text-xs shadow-2xs">
+                  <div class="flex items-center gap-2 truncate">
+                    <i data-lucide="check-circle" class="h-4 w-4 text-emerald-600 shrink-0"></i>
+                    <div class="truncate">
+                      <p id="submitTexName" class="font-bold text-slate-900 truncate text-[11px]">source.tex</p>
+                      <p id="submitTexSize" class="text-[10px] text-slate-500 font-mono">0 KB</p>
+                    </div>
+                  </div>
+                  <button type="button" id="btnRemoveTex" class="text-emerald-700 hover:text-emerald-900 text-[11px] font-bold px-1.5 py-0.5 hover:underline">
+                    Retirer
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Message d'alerte si format rejeté -->
+            <div id="submitFormatErrorAlert" class="hidden rounded-xl border border-rose-300 bg-rose-50 p-2.5 text-xs text-rose-800 flex items-center gap-2">
+              <i data-lucide="alert-circle" class="h-4 w-4 text-rose-600 shrink-0"></i>
+              <span id="submitFormatErrorText">Format non supporté : MATEX accepte exclusivement les fichiers .pdf et .tex.</span>
+            </div>
+
+            <!-- Fallback elements for JS compatibility -->
+            <input type="file" id="submitFileInput" accept=".pdf,.tex" class="hidden">
+            <div id="submitDropZone" class="hidden"></div>
+            <div id="submitFilePreviewContainer" class="hidden"></div>
+          </div>
+
+          <!-- Ligne 6 : Lien Google Drive optionnel direct -->
+          <div>
+            <label for="submitDriveUrl" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Lien Google Drive du document (optionnel si vous avez déjà un lien partagé) :
+            </label>
+            <div class="relative">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                <i data-lucide="link" class="h-3.5 w-3.5"></i>
+              </div>
+              <input
+                type="url"
+                id="submitDriveUrl"
+                placeholder="https://drive.google.com/file/d/... ou laissez vide pour téléversement automatique"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-xs font-medium text-slate-900 transition focus:border-indigo-600 focus:bg-white focus:outline-none"
+              >
+            </div>
+          </div>
+
+          <!-- Ligne 7 : Description synthétique -->
+          <div>
+            <label for="submitDescription" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Description / Consignes de travail :
+            </label>
+            <textarea
+              id="submitDescription"
+              rows="2"
+              placeholder="Détaillez les compétences visées, le barème indicatif ou les consignes pédagogiques..."
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-900"
+            ></textarea>
+          </div>
+
+          <!-- Ligne 8 : Code LaTeX optionnel -->
+          <div>
+            <label for="submitLatexCode" class="block text-[11px] font-bold text-slate-700 mb-1">
+              Code Source LaTeX (.tex) :
+            </label>
+            <textarea
+              id="submitLatexCode"
+              rows="3"
+              placeholder="\documentclass{article}&#10;\usepackage{amsmath}&#10;\begin{document}&#10;...&#10;\end{document}"
+              class="w-full rounded-xl border border-slate-800 bg-slate-950 font-mono text-xs text-emerald-400 p-3"
+            ></textarea>
+          </div>
+
+          <!-- Info Sync Drive & Sheets -->
+          <div class="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-[11px] text-emerald-900 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="h-4 w-4 text-emerald-700 shrink-0"></i>
+            <span>Le document sera automatiquement accessible sur la plateforme et archivé dans le dossier officiel Google Drive <strong>MATEX</strong>.</span>
+          </div>
+
+          <button
+            type="submit"
+            id="submitBtnSubmit"
+            class="w-full rounded-2xl bg-indigo-600 py-3 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-indigo-700 transition flex items-center justify-center gap-2"
+          >
+            <i data-lucide="upload" class="h-4 w-4"></i>
+            <span>Publier et Enregistrer sur Google Drive & Sheets</span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Contenu Onglet 2 : Explorateur du Référentiel Pédagogique -->
+      <div id="submitTabContentCurriculum" class="hidden">
+        <div id="submitCurriculumList" class="space-y-4"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 6 : CENTRE DE DIAGNOSTIC & TEST DE SYNCHRONISATION (Drive & Sheets) -->
+  <!-- ========================================================================= -->
+  <div id="modalDiagnostic" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-2xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in max-h-[92vh] overflow-y-auto">
+      
+      <!-- Bouton fermer -->
+      <button
+        type="button"
+        onclick="closeDiagnosticModal()"
+        class="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition"
+      >
+        <i data-lucide="x" class="h-4 w-4"></i>
+      </button>
+
+      <!-- En-tête -->
+      <div class="border-b border-slate-200 pb-4 mb-5">
+        <div class="inline-flex items-center gap-2 rounded-full bg-indigo-50 border border-indigo-100 px-3 py-1 text-xs font-bold text-indigo-700 mb-2">
+          <i data-lucide="activity" class="h-3.5 w-3.5 text-indigo-600"></i>
+          <span>Diagnostic Temps Réel</span>
+        </div>
+        <h3 class="font-serif text-xl font-black text-slate-900">
+          Centre de Test & Synchronisation Google Drive & Sheets
+        </h3>
+        <p class="text-xs text-slate-500 mt-1">
+          Validez en un clic que votre portail MATEX communique avec votre feuille Google Sheets et votre dossier Google Drive.
+        </p>
+      </div>
+
+      <!-- ALERTE EXPLICATIVE MAJEURE : OÙ TROUVER LES DONNÉES DANS SHEETS -->
+      <div class="rounded-2xl border-2 border-emerald-500/40 bg-emerald-50/80 p-4 mb-5 text-xs text-emerald-950 space-y-2">
+        <div class="flex items-center gap-2 font-bold text-emerald-900 text-sm">
+          <i data-lucide="sparkles" class="h-4 w-4 text-emerald-600 shrink-0"></i>
+          <span>Où sont vos données dans Google Sheets ? (Important)</span>
+        </div>
+        <p class="text-emerald-800 leading-relaxed">
+          Google Sheets crée par défaut une page vierge appelée <strong>« Feuille 1 »</strong>. Vos documents enregistrés et vos tests se trouvent dans l'onglet vert <strong>« Documents_MATEX »</strong> situé <strong>tout en bas de votre écran</strong> à côté de « Feuille 1 ».
+        </p>
+      </div>
+
+      <!-- État des Connexions -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+        <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-1">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="table" class="h-4 w-4 text-emerald-600"></i> Google Sheets
+            </span>
+            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connecté
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 truncate">ID : 100kYZ-lrTW069edLrur_RBfqxsvu288jeES5zQ-tZTI</p>
+          <p class="text-[11px] font-semibold text-slate-700">Onglet cible : <code class="bg-slate-200 text-slate-800 px-1 py-0.5 rounded">Documents_MATEX</code></p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 space-y-1">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="folder" class="h-4 w-4 text-indigo-600"></i> Google Drive
+            </span>
+            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full">
+              <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span> Opérationnel
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 truncate">ID : 1jWAn2ZHD4vU8NAypKcsXI5Ias8oIZFYF</p>
+          <p class="text-[11px] font-semibold text-slate-700">Stockage : <span class="text-indigo-600">Fichiers & Sujets PDF</span></p>
+        </div>
+      </div>
+
+      <!-- Section Test Direct -->
+      <div class="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-4 mb-5">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-2 flex items-center gap-1.5">
+          <i data-lucide="play" class="h-3.5 w-3.5 text-indigo-600"></i>
+          Test d'Écriture Automatique en 1 Clic
+        </h4>
+        <p class="text-xs text-slate-600 mb-3 leading-relaxed">
+          Cliquez sur le bouton ci-dessous : un document de test certifié sera immédiatement inséré dans votre tableau Google Sheets et un fichier test sera archivé dans votre Google Drive.
+        </p>
+
+        <button
+          type="button"
+          id="btnRunLiveTest"
+          onclick="runLiveSystemTest()"
+          class="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-sm"
+        >
+          <i data-lucide="send" class="h-4 w-4"></i>
+          <span id="btnRunLiveTestText">🚀 Exécuter le Test Immédiat (Écrire 1 Ligne dans Sheets & Drive)</span>
+        </button>
+
+        <!-- Console de logs du test -->
+        <div id="diagnosticTestLogs" class="mt-3 hidden rounded-xl bg-slate-900 p-3.5 text-left font-mono text-[11px] text-slate-200 space-y-1">
+          <div class="text-slate-400">=== RÉSULTATS DU TEST EN DIRECT ===</div>
+          <div id="diagnosticLogStep1"></div>
+          <div id="diagnosticLogStep2"></div>
+          <div id="diagnosticLogStep3"></div>
+          <div id="diagnosticLogFinal" class="pt-1 font-bold"></div>
+        </div>
+      </div>
+
+      <!-- Liens rapides d'inspection -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200 text-xs">
+        <span class="text-slate-500 font-medium">Vérification manuelle :</span>
+        <div class="flex items-center gap-2">
+          <a
+            href="https://docs.google.com/spreadsheets/d/100kYZ-lrTW069edLrur_RBfqxsvu288jeES5zQ-tZTI/edit?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg transition"
+          >
+            <i data-lucide="table" class="h-3.5 w-3.5"></i> Ouvrir la Feuille Google Sheets
+          </a>
+          <a
+            href="https://drive.google.com/drive/folders/1jWAn2ZHD4vU8NAypKcsXI5Ias8oIZFYF?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1 text-indigo-700 hover:text-indigo-900 font-bold bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg transition"
+          >
+            <i data-lucide="folder" class="h-3.5 w-3.5"></i> Ouvrir Google Drive
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts JavaScript Principaux -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

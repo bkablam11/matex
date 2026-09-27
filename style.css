@@ -1,0 +1,180 @@
+/**
+ * ==========================================================================
+ * MATEX - Feuilles de styles personnalisées
+ * Bibliothèque Pédagogique & Communauté Nationale • CP1 au Master 2
+ * ==========================================================================
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --primary: #4338ca;
+  --primary-hover: #3730a3;
+  --secondary: #059669;
+  --accent: #d97706;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', Times, serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* KaTeX custom sizing & overflow */
+.katex-display {
+  margin: 0.5em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+.katex {
+  font-size: 1.05em;
+  text-rendering: auto;
+}
+
+/* Authentic A4 Paper preview */
+.a4-paper-sheet {
+  width: 100%;
+  max-width: 794px; /* standard 96dpi A4 width */
+  min-height: 1123px; /* standard 96dpi A4 height */
+  background: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  padding: 2.5rem 3rem;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  transition: transform 0.2s ease-in-out;
+  transform-origin: top center;
+}
+
+/* Badge and cycle colors */
+.cycle-badge-primaire {
+  background-color: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.cycle-badge-college {
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.cycle-badge-lycee {
+  background-color: #eef2ff;
+  color: #4338ca;
+  border-color: #c7d2fe;
+}
+
+.cycle-badge-superieur {
+  background-color: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Active tab styles */
+.tab-btn-active {
+  background-color: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn-inactive {
+  color: #64748b;
+}
+
+.tab-btn-inactive:hover {
+  color: #0f172a;
+}
+
+/* Print Optimization */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #modalDocumentViewer,
+  #modalDocumentViewer * {
+    visibility: visible;
+  }
+  
+  #modalDocumentViewer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent !important;
+  }
+
+  .no-print,
+  .modal-close-btn,
+  .viewer-controls-bar,
+  .viewer-bottom-banner {
+    display: none !important;
+  }
+
+  .a4-paper-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 1.5cm 2cm !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    transform: none !important;
+  }
+}
