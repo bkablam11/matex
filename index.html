@@ -571,6 +571,294 @@
   </section>
 
   <!-- ========================================================================= -->
+  <!-- VUE : STUDIO IA - NUMERISATION OVERLEAF-LIKE (PHOTO VERS PDF)             -->
+  <!-- ========================================================================= -->
+  <section id="viewAiStudio" class="hidden flex-1 pb-16">
+    <div class="border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white py-10 sm:py-14">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 text-center">
+        
+        <div class="inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-4 py-1 text-xs font-bold text-purple-200 backdrop-blur-md mb-4">
+          <i data-lucide="sparkles" class="h-4 w-4 text-purple-400"></i>
+          <span>Assistant de Numerisation Pedagogique Automatique</span>
+        </div>
+
+        <h1 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+          Photographiez un Sujet, Obtenez le PDF Imprimable
+        </h1>
+
+        <p class="mt-3 max-w-2xl mx-auto text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
+          Prenez une photo nette de votre evaluation ou chargez une image. L intelligence artificielle retranscrit vos exercices et compile directement le document en PDF selon les gabarits homologues MATEX.
+        </p>
+
+        <!-- Statut Cle API -->
+        <div class="mt-5 inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3.5 py-1.5 text-xs text-slate-300">
+          <span class="flex h-2 w-2 rounded-full bg-emerald-400"></span>
+          <span>Cle Gemini preconfiguree & active</span>
+          <button type="button" onclick="toggleApiKeyModal()" class="text-purple-300 hover:text-white underline font-semibold text-[11px] ml-1">
+            Changer la cle
+          </button>
+        </div>
+
+        <div id="apiKeyEditPanel" class="hidden mt-3 max-w-md mx-auto flex items-center gap-2">
+          <input
+            type="password"
+            id="inputUserApiKey"
+            placeholder="Coller une autre cle API Gemini..."
+            class="flex-1 rounded-xl border border-white/20 bg-slate-900 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-400"
+          >
+          <button
+            type="button"
+            onclick="saveUserApiKey()"
+            class="rounded-xl bg-purple-600 hover:bg-purple-500 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm"
+          >
+            Enregistrer
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Espace Studio en 2 Colonnes (comme sur Overleaf) -->
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- PANNEAU GAUCHE : Selection & Prise de Photo -->
+        <div class="lg:col-span-5 space-y-5">
+          <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-5">
+            
+            <!-- Etape 1 : Choix du type de document -->
+            <div>
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-xs">1</span>
+                <h3 class="font-serif text-sm font-bold text-slate-900">Type de document a generer :</h3>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  id="btnSelectInterro"
+                  onclick="setAiDocumentType('interro')"
+                  class="rounded-2xl border-2 border-indigo-600 bg-indigo-50/80 p-3 text-center transition flex flex-col items-center justify-between"
+                >
+                  <i data-lucide="scissors" class="h-4 w-4 text-indigo-700 mb-1"></i>
+                  <span class="text-xs font-bold text-indigo-950">Interro</span>
+                  <span class="text-[9px] text-indigo-600 font-semibold mt-0.5">2 par page A4</span>
+                </button>
+
+                <button
+                  type="button"
+                  id="btnSelectDevoir"
+                  onclick="setAiDocumentType('devoir')"
+                  class="rounded-2xl border border-slate-200 bg-white p-3 text-center transition hover:bg-slate-50 flex flex-col items-center justify-between"
+                >
+                  <i data-lucide="file-text" class="h-4 w-4 text-slate-600 mb-1"></i>
+                  <span class="text-xs font-bold text-slate-800">Devoir</span>
+                  <span class="text-[9px] text-slate-400 font-semibold mt-0.5">Format 2 pages</span>
+                </button>
+
+                <button
+                  type="button"
+                  id="btnSelectCorrige"
+                  onclick="setAiDocumentType('corrige')"
+                  class="rounded-2xl border border-slate-200 bg-white p-3 text-center transition hover:bg-slate-50 flex flex-col items-center justify-between"
+                >
+                  <i data-lucide="check-check" class="h-4 w-4 text-slate-600 mb-1"></i>
+                  <span class="text-xs font-bold text-slate-800">Corrige</span>
+                  <span class="text-[9px] text-slate-400 font-semibold mt-0.5">Bareme + Bilan</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Etape 2 : Photo ou Fichier Image -->
+            <div>
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-xs">2</span>
+                <h3 class="font-serif text-sm font-bold text-slate-900">Photo de votre sujet :</h3>
+              </div>
+
+              <div
+                id="aiDropZonePhoto"
+                class="cursor-pointer rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center hover:border-indigo-600 hover:bg-indigo-50/20 transition"
+              >
+                <i data-lucide="camera" class="h-8 w-8 mx-auto text-indigo-600 mb-2"></i>
+                <p class="text-xs font-bold text-slate-800">Prendre une photo ou importer l image</p>
+                <p class="text-[11px] text-slate-400 mt-1">Manuscrit ou imprime (feuille bien a plat)</p>
+                <input type="file" id="aiInputPhoto" accept="image/*" capture="environment" class="hidden">
+              </div>
+
+              <!-- Apercu photo selectionnee -->
+              <div id="aiPreviewPhotoBox" class="hidden mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-2">
+                <div class="max-h-56 overflow-hidden rounded-xl bg-slate-900 flex items-center justify-center">
+                  <img id="aiPreviewImg" src="" alt="Apercu sujet" class="max-h-56 object-contain">
+                </div>
+                <div class="flex items-center justify-between text-xs px-1">
+                  <span id="aiPreviewFileName" class="text-slate-700 font-bold truncate max-w-[200px]">sujet.jpg</span>
+                  <button type="button" id="btnRemoveAiPhoto" class="text-rose-600 hover:text-rose-800 font-bold">
+                    Reprendre
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Etape 3 : Bouton d action principal -->
+            <div>
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-xs">3</span>
+                <h3 class="font-serif text-sm font-bold text-slate-900">Generation du document :</h3>
+              </div>
+
+              <button
+                type="button"
+                id="btnConvertPhotoToPdf"
+                onclick="runPhotoToPdfPipeline()"
+                class="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3.5 text-xs sm:text-sm font-bold text-white shadow-md transition"
+              >
+                <i data-lucide="sparkles" class="h-4 w-4"></i>
+                <span>Transcrire et Compiler en PDF</span>
+              </button>
+            </div>
+
+            <!-- Indicateur de progression temps reel -->
+            <div id="aiProcessingState" class="hidden rounded-2xl border border-indigo-200 bg-indigo-50/80 p-4 space-y-2.5 text-xs">
+              <div class="flex items-center justify-between font-bold text-indigo-950">
+                <span id="aiProgressMessage">Lecture de l image par l IA...</span>
+                <i data-lucide="loader-2" class="h-4 w-4 animate-spin text-indigo-600"></i>
+              </div>
+              <div class="w-full bg-indigo-200/60 rounded-full h-1.5 overflow-hidden">
+                <div id="aiProgressBarLine" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300 w-1/4"></div>
+              </div>
+              <p id="aiProgressDetail" class="text-[10px] text-indigo-700">Extraction des formules, des exercices et adaptation au gabarit officiel...</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PANNEAU DROIT : Rendu Overleaf (Visionneuse PDF & Code TeX) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs min-h-[620px] flex flex-col">
+            
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-4">
+              <div>
+                <h3 class="font-serif text-base sm:text-lg font-bold text-slate-900">Rendu Document (Style Overleaf)</h3>
+                <p id="aiStudioSubStatus" class="text-xs text-slate-400">En attente d une premiere numerisation.</p>
+              </div>
+
+              <!-- Onglets PDF vs Code TeX -->
+              <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold border border-slate-200">
+                <button
+                  type="button"
+                  id="tabStudioPdf"
+                  onclick="switchStudioTab('pdf')"
+                  class="rounded-lg px-3 py-1.5 transition bg-white text-slate-900 shadow-xs flex items-center gap-1.5"
+                >
+                  <i data-lucide="file-text" class="h-3.5 w-3.5 text-rose-600"></i>
+                  <span>Apercu PDF Reel</span>
+                </button>
+                <button
+                  type="button"
+                  id="tabStudioTex"
+                  onclick="switchStudioTab('tex')"
+                  class="rounded-lg px-3 py-1.5 transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
+                >
+                  <i data-lucide="code" class="h-3.5 w-3.5 text-emerald-600"></i>
+                  <span>Code LaTeX (.tex)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ONGLET 1 : Visionneuse PDF native -->
+            <div id="studioPanelPdf" class="flex-1 flex flex-col justify-between">
+              <div id="studioPdfViewerBox" class="flex-1 rounded-2xl border border-slate-200 bg-slate-950 p-2 sm:p-3 min-h-[520px] flex items-center justify-center overflow-hidden">
+                
+                <div id="studioEmptyState" class="text-center py-20 text-slate-400 space-y-2">
+                  <i data-lucide="file-search" class="h-10 w-10 mx-auto text-slate-500"></i>
+                  <p class="text-xs font-semibold text-slate-300">Aucun document n a encore ete compile.</p>
+                  <p class="text-[11px] text-slate-500">Selectionnez un gabarit, prenez votre photo et lancez la transcription.</p>
+                </div>
+
+                <iframe
+                  id="studioPdfIframe"
+                  src=""
+                  class="hidden w-full h-[580px] rounded-xl border-0 bg-white"
+                  title="Document PDF Compile"
+                ></iframe>
+              </div>
+
+              <!-- Barre d actions rapides sous le PDF -->
+              <div id="studioActionsBar" class="hidden mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onclick="recompileStudioDocument()"
+                  id="btnStudioRecompile"
+                  class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 transition shadow-2xs"
+                >
+                  <i data-lucide="refresh-cw" class="h-3.5 w-3.5 text-indigo-600"></i>
+                  <span>Recompiler</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onclick="printStudioPdf()"
+                    class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 transition shadow-2xs"
+                  >
+                    <i data-lucide="printer" class="h-3.5 w-3.5"></i>
+                    <span>Imprimer</span>
+                  </button>
+                  <button
+                    type="button"
+                    onclick="downloadStudioPdf()"
+                    class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 px-4 py-2 text-xs font-bold text-white transition shadow-xs"
+                  >
+                    <i data-lucide="download" class="h-4 w-4"></i>
+                    <span>Telecharger PDF</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ONGLET 2 : Editeur de Code LaTeX Brut -->
+            <div id="studioPanelTex" class="hidden flex-1 flex flex-col">
+              <div class="flex items-center justify-between mb-2">
+                <span id="studioTexStats" class="text-[11px] font-mono text-slate-400">0 caractere</span>
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onclick="copyStudioTexCode()"
+                    id="btnCopyStudioTex"
+                    class="inline-flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 transition"
+                  >
+                    <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+                    <span>Copier le Code</span>
+                  </button>
+                  <button
+                    type="button"
+                    onclick="downloadStudioTexFile()"
+                    class="inline-flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white transition shadow-2xs"
+                  >
+                    <i data-lucide="download" class="h-3.5 w-3.5"></i>
+                    <span>Telecharger .tex</span>
+                  </button>
+                </div>
+              </div>
+
+              <textarea
+                id="studioTexEditor"
+                rows="24"
+                class="w-full flex-1 rounded-2xl border border-slate-800 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-100 focus:outline-none focus:border-indigo-500"
+                placeholder="% Le code source LaTeX s affichera ici..."
+                spellcheck="false"
+              ></textarea>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
   <!-- CARROUSEL PHOTOS DE LA 2E COHORTE                                         -->
   <!-- ========================================================================= -->
   <section id="sectionCohorte2Carousel" class="border-t border-slate-200 bg-gradient-to-b from-white via-slate-50/50 to-slate-100/60 py-12 overflow-hidden relative">

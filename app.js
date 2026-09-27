@@ -221,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSubmitForm();
   setupDonateForm();
   setupJoinForm();
+  initAiStudioModule(); // <-- Initialisation du Studio IA
   renderApp();
 
   if (window.lucide) {
@@ -371,6 +372,8 @@ function setupNavigation() {
   const btnNavJoin = document.getElementById('navBtnJoin');
   const btnHeroExplore = document.getElementById('btnHeroExplore');
   const btnHeroTraining = document.getElementById('btnHeroTraining');
+  const btnNavAiStudio = document.getElementById('navBtnAiStudio');
+  if (btnNavAiStudio) btnNavAiStudio.addEventListener('click', () => switchNavTab('aiStudio'));
 
   if (btnNavLibrary) btnNavLibrary.addEventListener('click', () => switchNavTab('library'));
   if (btnNavTraining) btnNavTraining.addEventListener('click', () => switchNavTab('training'));
@@ -389,24 +392,35 @@ function switchNavTab(tab) {
   state.activeNavTab = tab;
   const viewLibrary = document.getElementById('viewLibrary');
   const viewTraining = document.getElementById('viewTraining');
+  const viewAiStudio = document.getElementById('viewAiStudio');
+
   const btnNavLibrary = document.getElementById('navBtnLibrary');
   const btnNavTraining = document.getElementById('navBtnTraining');
+  const btnNavAiStudio = document.getElementById('navBtnAiStudio');
+
+  [btnNavLibrary, btnNavTraining, btnNavAiStudio].forEach(b => {
+    b?.classList.remove('bg-white', 'text-slate-900', 'shadow-xs');
+    b?.classList.add('text-slate-600');
+  });
+
+  viewLibrary?.classList.add('hidden');
+  viewTraining?.classList.add('hidden');
+  viewAiStudio?.classList.add('hidden');
 
   if (tab === 'library') {
     viewLibrary?.classList.remove('hidden');
-    viewTraining?.classList.add('hidden');
     btnNavLibrary?.classList.add('bg-white', 'text-slate-900', 'shadow-xs');
     btnNavLibrary?.classList.remove('text-slate-600');
-    btnNavTraining?.classList.remove('bg-white', 'text-slate-900', 'shadow-xs');
-    btnNavTraining?.classList.add('text-slate-600');
     renderDocuments();
-  } else {
-    viewLibrary?.classList.add('hidden');
+  } else if (tab === 'training') {
     viewTraining?.classList.remove('hidden');
     btnNavTraining?.classList.add('bg-white', 'text-slate-900', 'shadow-xs');
     btnNavTraining?.classList.remove('text-slate-600');
-    btnNavLibrary?.classList.remove('bg-white', 'text-slate-900', 'shadow-xs');
-    btnNavLibrary?.classList.add('text-slate-600');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (tab === 'aiStudio') {
+    viewAiStudio?.classList.remove('hidden');
+    btnNavAiStudio?.classList.add('bg-white', 'text-slate-900', 'shadow-xs');
+    btnNavAiStudio?.classList.remove('text-slate-600');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -2492,6 +2506,698 @@ function isTexDocument(doc) {
 function compileCurrentTexDoc() {
   alert("Module de Compilation Dedie :\nLa compilation automatique est traitee par un module dedie.\nVous pouvez telecharger directement le fichier original .tex ci-dessous ou le copier pour le compiler avec votre environnement habituel (TeXstudio, MiKTeX, Overleaf).");
 }
+
+
+/**
+ * ==========================================================================
+ * 18. MOTEUR DU STUDIO IA : PHOTO VERS CODE LATEX & COMPILATION PDF (OVERLEAF-LIKE)
+ * Cle Gemini configuree par defaut + Compilation Cloud autonome
+ * ==========================================================================
+ */
+
+const DEFAULT_AI_KEY = "AQ.Ab8RN6L8YnPqbSjlf1qANmgQ7oCOIgdxZVjjvztea428taNpfg";
+const STORAGE_KEY_AI = "matex_gemini_api_key";
+
+function getActiveAiKey() {
+  return (localStorage.getItem(STORAGE_KEY_AI) || DEFAULT_AI_KEY).trim();
+}
+
+// Les 3 gabarits exacts memorises (interro, devoir, corrige)
+const MATEX_AI_TEMPLATES = {
+  interro: `\\documentclass[a4paper,12pt]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage[french]{babel}
+\\usepackage{amsmath, amssymb} 
+\\usepackage{geometry}
+\\usepackage{array} 
+\\usepackage{xcolor}   
+\\usepackage{colortbl} 
+\\usepackage{tikz}
+
+\\geometry{
+  a4paper,
+  top=0.7cm,      
+  bottom=0.7cm,   
+  left=1.2cm,     
+  right=1.2cm     
+}
+
+\\pagestyle{empty}
+\\renewcommand{\\familydefault}{\\sfdefault} 
+
+\\definecolor{lightgray}{gray}{0.92}
+\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1}}
+\\newcolumntype{C}[1]{>{\\centering\\arraybackslash}p{#1}}
+\\setlength{\\tabcolsep}{4pt}
+
+\\newcommand{\\sujet}{%
+  \\noindent
+  \\renewcommand{\\arraystretch}{1.6}
+  \\begin{tabular}{|L{0.48\\linewidth}|L{0.24\\linewidth}|L{0.24\\linewidth}|}
+    \\hline
+    Nom : & \\textbf{Note :} & Classe : ......... \\\\
+    \\cline{1-1} \\cline{3-3}
+    Prénoms : & & Durée : 15 min \\\\
+    \\hline
+  \\end{tabular}
+  \\renewcommand{\\arraystretch}{1}
+  
+  \\vspace{0.15cm}
+  
+  \\begin{center}
+    \\textbf{\\large \\underline{Interrogation écrite \\no 1}}
+  \\end{center}
+  
+  \\vspace{0.1cm}
+  [CORPS_EXERCICES]
+}
+
+\\begin{document}
+  \\sujet
+  \\begin{center}
+    \\begin{tikzpicture}
+      \\draw[dashed, line width=0.8pt, gray!80] (0,0) -- (\\linewidth,0);
+      \\node[fill=white, inner sep=4pt] at (0.5\\linewidth, 0) {\\footnotesize\\textbf{--- Découper ici ---}};
+    \\end{tikzpicture}
+  \\end{center}
+  \\sujet
+\\end{document}`,
+
+  devoir: `\\documentclass[12pt, a4paper]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage[french]{babel}
+\\usepackage{amsmath, amssymb, amsfonts}
+\\usepackage{geometry}
+\\usepackage{tabularx}
+\\usepackage{graphicx}
+\\usepackage{fancyhdr}
+\\hyphenpenalty=10000
+\\usepackage{tikz}
+\\usetikzlibrary{calc}
+\\usepackage{enumitem}
+
+\\geometry{left=1.5cm, right=1.5cm, top=1cm, bottom=2cm}
+\\pagestyle{fancy}
+\\fancyhf{}
+\\renewcommand{\\headrulewidth}{0pt}
+\\cfoot{\\textbf{Page \\thepage\\ sur 2}}
+
+\\renewcommand{\\theenumi}{\\arabic{enumi})}
+\\renewcommand{\\labelenumi}{\\theenumi}
+\\setlength{\\parindent}{0pt}
+
+\\begin{document}
+
+\\noindent
+\\begin{tabularx}{\\textwidth}{@{}m{4cm} X c@{}}
+  \\begin{minipage}[t]{4cm}
+    \\centering
+    \\textbf{Lycée d Excellence} \\\\
+    \\rule{0.6\\linewidth}{0.4pt} \\\\
+  \\end{minipage}
+  &
+  \\begin{minipage}[t]{\\linewidth}
+    \\centering
+    \\large\\textbf{DEVOIR DE NIVEAU : MATHÉMATIQUES}
+  \\end{minipage}
+  &
+  \\begin{minipage}[t]{3.5cm}
+    \\raggedleft
+    \\textbf{2026-2027} \\\\
+    \\textbf{Durée : 2h00}
+  \\end{minipage}
+\\end{tabularx}
+
+\\begin{center}
+  \\textit{Cette épreuve comporte deux pages numérotées 1/2 et 2/2. L'usage de la calculatrice scientifique est autorisé.}
+\\end{center}
+\\rule{\\linewidth}{0.8pt}
+
+[CORPS_EXERCICES]
+
+\\end{document}`,
+
+  corrige: `\\documentclass[12pt, a4paper]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
+\\usepackage[french]{babel}
+\\usepackage{amsmath, amssymb, amsfonts}
+\\usepackage{geometry}
+\\usepackage{fancyhdr}
+\\usepackage{graphicx}
+\\usepackage[svgnames]{xcolor}
+\\usepackage{tabularx}
+
+\\geometry{left=1.5cm, right=1.5cm, top=3.5cm, bottom=2cm, headheight=3cm}
+\\setlength{\\parindent}{0pt}
+
+\\pagestyle{fancy}
+\\fancyhf{}
+\\renewcommand{\\headrulewidth}{0.6pt}
+\\renewcommand{\\footrulewidth}{0pt}
+
+\\fancyhead{\\begin{tabularx}{\\textwidth}{@{} m{4.5cm} X m{3.5cm} @{}}
+  \\begin{minipage}[c]{4.5cm}
+    \\centering
+    \\vspace{0.1cm}
+    \\small\\textbf{Lycée d Excellence}
+  \\end{minipage}
+  &
+  \\begin{minipage}[c]{\\linewidth}
+    \\centering
+    \\Large\\textbf{Corrigé et barème du Devoir de Mathématiques} \\\\
+    \\large\\textbf{Discipline : Mathématiques}
+  \\end{minipage}
+  &
+  \\begin{minipage}[c]{3.5cm}
+    \\raggedleft
+    \\small\\textbf{Année Scolaire} \\\\
+    \\small 2026-2027 \\\\
+    \\vspace{0.2cm}
+    \\small\\textbf{Barème Total} \\\\
+    \\small Noté sur 20 points
+  \\end{minipage}
+\\end{tabularx}}
+
+\\cfoot{\\thepage}
+
+\\newcommand{\\exercice}[3]{
+  \\subsection*{#1 : #2 (#3)}
+  \\vspace{-0.3cm}
+  \\hrule height 0.6pt 
+  \\vspace{0.5cm}
+}
+\\newcommand{\\points}[1]{\\hfill \\textcolor{gray}{\\texttt{-~-~-~-~>}} \\quad \\textit{(#1)}}
+\\newcommand{\\reponse}[1]{\\color{red!90!black}\\bfseries #1}
+\\newcommand{\\reponseMath}[1]{\\color{red!90!black}\\mathbf{#1}}
+
+\\begin{document}
+
+[CORPS_EXERCICES]
+
+\\rule{\\linewidth}{0.8pt}
+\\begin{center}
+  \\large\\textbf{ANALYSE DES DONNÉES STATISTIQUES}
+\\end{center}
+\\rule{\\linewidth}{0.4pt}
+\\vspace{0.3cm}
+
+\\begin{tabular}{p{0.48\\linewidth} p{0.48\\linewidth}}
+  Effectif total : \\dotfill & Nombre d'absent(s) : \\dotfill \\\\
+  \\\\[5pt]
+  Élèves avec moyenne ($\\ge 10/20$) : \\dotfill & Taux de réussite : \\dotfill \\\\
+  \\\\[5pt]
+  Moyenne de la classe : \\dotfill & \\\\
+\\end{tabular}
+
+\\vspace{0.5cm}
+
+\\newcolumntype{C}[1]{>{\\centering\\arraybackslash}p{#1}}
+
+\\begin{tabular}{|l|C{2.8cm}|C{2.8cm}|C{2.8cm}|C{2.8cm}|}
+  \\hline
+  \\bfseries Notes (N) & \\bfseries N $\\le$ 5 & \\bfseries 6 $\\le$ N $\\le$ 9 & \\bfseries 10 $\\le$ N $\\le$ 14 & \\bfseries 15 $\\le$ N $\\le$ 20 \\\\
+  \\hline
+  \\bfseries Effectifs & & & & \\\\
+  \\hline
+  \\bfseries \\% Effectif & & & & \\\\
+  \\hline
+\\end{tabular}
+
+\\end{document}`
+};
+
+// Etat du Studio
+const aiStudioState = {
+  docType: 'interro',
+  imageBase64: null,
+  imageMimeType: 'image/jpeg',
+  imageFileName: '',
+  generatedTex: '',
+  compiledPdfBlobUrl: null,
+  currentTab: 'pdf'
+};
+
+function initAiStudioModule() {
+  const dropZone = document.getElementById('aiDropZonePhoto');
+  const fileInput = document.getElementById('aiInputPhoto');
+  const previewBox = document.getElementById('aiPreviewPhotoBox');
+  const previewImg = document.getElementById('aiPreviewImg');
+  const previewName = document.getElementById('aiPreviewFileName');
+  const btnRemove = document.getElementById('btnRemoveAiPhoto');
+
+  dropZone?.addEventListener('click', () => fileInput?.click());
+
+  fileInput?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) handlePhotoFile(file);
+  });
+
+  dropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('border-indigo-600', 'bg-indigo-50/50');
+  });
+  dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('border-indigo-600', 'bg-indigo-50/50'));
+  dropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('border-indigo-600', 'bg-indigo-50/50');
+    const file = e.dataTransfer.files?.[0];
+    if (file) handlePhotoFile(file);
+  });
+
+  btnRemove?.addEventListener('click', () => {
+    aiStudioState.imageBase64 = null;
+    aiStudioState.imageFileName = '';
+    if (fileInput) fileInput.value = '';
+    previewBox?.classList.add('hidden');
+    dropZone?.classList.remove('hidden');
+  });
+
+  function handlePhotoFile(file) {
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez selectionner une image valide (JPG ou PNG).');
+      return;
+    }
+    aiStudioState.imageFileName = file.name;
+    let mime = (file.type || 'image/jpeg').toLowerCase();
+    if (mime === 'image/jpg') mime = 'image/jpeg';
+    aiStudioState.imageMimeType = mime;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target.result;
+      aiStudioState.imageBase64 = dataUrl.split('base64,')[1];
+      if (previewImg) previewImg.src = dataUrl;
+      if (previewName) previewName.textContent = file.name;
+      dropZone?.classList.add('hidden');
+      previewBox?.classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function setAiDocumentType(type) {
+  aiStudioState.docType = type;
+  const btnInterro = document.getElementById('btnSelectInterro');
+  const btnDevoir = document.getElementById('btnSelectDevoir');
+  const btnCorrige = document.getElementById('btnSelectCorrige');
+
+  const activeCls = 'rounded-2xl border-2 border-indigo-600 bg-indigo-50/80 p-3 text-center transition flex flex-col items-center justify-between shadow-2xs';
+  const inactiveCls = 'rounded-2xl border border-slate-200 bg-white p-3 text-center transition hover:bg-slate-50 flex flex-col items-center justify-between';
+
+  if (btnInterro) btnInterro.className = type === 'interro' ? activeCls : inactiveCls;
+  if (btnDevoir) btnDevoir.className = type === 'devoir' ? activeCls : inactiveCls;
+  if (btnCorrige) btnCorrige.className = type === 'corrige' ? activeCls : inactiveCls;
+}
+
+function toggleApiKeyModal() {
+  const p = document.getElementById('apiKeyEditPanel');
+  p?.classList.toggle('hidden');
+}
+
+function saveUserApiKey() {
+  const input = document.getElementById('inputUserApiKey');
+  const key = (input?.value || '').trim();
+  if (key) {
+    localStorage.setItem(STORAGE_KEY_AI, key);
+    alert('Cle API enregistree avec succes.');
+    toggleApiKeyModal();
+  }
+}
+
+async function runPhotoToPdfPipeline() {
+  if (!aiStudioState.imageBase64) {
+    alert('Veuillez d abord prendre une photo ou charger une image de votre sujet.');
+    return;
+  }
+
+  const btn = document.getElementById('btnConvertPhotoToPdf');
+  const progressBox = document.getElementById('aiProcessingState');
+  const progressBar = document.getElementById('aiProgressBarLine');
+  const progressMsg = document.getElementById('aiProgressMessage');
+  const progressDetail = document.getElementById('aiProgressDetail');
+  const subStatus = document.getElementById('aiStudioSubStatus');
+
+  if (btn) btn.disabled = true;
+  progressBox?.classList.remove('hidden');
+  if (progressBar) progressBar.style.width = '20%';
+  if (progressMsg) progressMsg.textContent = 'Envoi de la photo a l intelligence artificielle...';
+  if (progressDetail) progressDetail.textContent = 'Analyse de la mise en page et transcription des formules...';
+
+  const baseTemplate = MATEX_AI_TEMPLATES[aiStudioState.docType];
+
+  const systemInstruction = `# CONTEXTE ET ROLE
+Tu es le transcripteur mathematique et typographe LaTeX officiel de la plateforme nationale MATEX (Cote d Ivoire). Ton travail doit etre directement pret a imprimer pour les classes du primaire au superieur.
+
+# MISSION
+Convertis fidelement cette image d evaluation mathematique en un code LaTeX complet.
+Tu dois IMPERATIVEMENT conserver l integralite du preambule du modele ci-dessous et substituer le marqueur [CORPS_EXERCICES] par le contenu exact extrait de l image.
+
+# REGLES DE TRANSCRIPTION MATHEMATIQUE
+- Fractions : \\dfrac{a}{b}
+- Ensembles : \\mathbb{R}, \\mathbb{N}, \\mathbb{Z}
+- Equations et systemes : \\begin{cases} ... \\end{cases} ou \\begin{align*} ... \\end{align*}
+- Vecteurs : \\vec{u}, \\overrightarrow{AB}
+- Integrales et limites : \\int_{a}^{b}, \\lim_{x \\to +\\infty}
+- Figures geometriques : convertis-les en code TikZ compatible.
+- Si le modele choisi est "corrige", utilise obligatoirement les macros : \\exercice{Titre}{Notion}{Points}, \\reponse{...}, \\reponseMath{...} et \\points{... pt}.
+
+# GABARIT STRICT A RETOURNER :
+${baseTemplate}
+
+# REGLE STRICTE DE SORTIE
+Renvoie UNIQUEMENT le code LaTeX complet. Ne rajoute AUCUN texte d introduction ou de conclusion. N inclus pas de balises Markdown du type \`\`\`latex. Le texte commence directement par \\documentclass et finit par \\end{document}.`;
+
+  try {
+    const apiKey = getActiveAiKey();
+
+    // Modeles officiels avec bascule automatique de secours
+    const availableModels = [
+      'gemini-2.0-flash',
+      'gemini-3.8-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-3.7-flash',
+      'gemini-2.5-flash'
+    ];
+
+    let safeMime = (aiStudioState.imageMimeType || 'image/jpeg').toLowerCase();
+    if (safeMime === 'image/jpg') safeMime = 'image/jpeg';
+
+    const requestPayload = {
+      system_instruction: {
+        parts: [{ text: systemInstruction }]
+      },
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: 'Retranscris cette evaluation mathematique en appliquant rigoureusement le gabarit LaTeX officiel fourni.' },
+            {
+              inline_data: {
+                mime_type: safeMime,
+                data: aiStudioState.imageBase64
+              }
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 8192
+      }
+    };
+
+    if (progressBar) progressBar.style.width = '55%';
+    if (progressMsg) progressMsg.textContent = 'Transcription des exercices et mise en forme LaTeX...';
+
+    let lastError = null;
+    let codeTex = '';
+
+    // Boucle de resolution de modele automatique
+    for (const modelName of availableModels) {
+      const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent?key=' + encodeURIComponent(apiKey);
+      try {
+        const resp = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey
+          },
+          body: JSON.stringify(requestPayload)
+        });
+
+        const data = await resp.json();
+        if (resp.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          codeTex = data.candidates[0].content.parts[0].text;
+          break; // Succes avec le premier modele disponible
+        } else {
+          lastError = data.error?.message || ('Erreur sur ' + modelName);
+        }
+      } catch (reqErr) {
+        lastError = reqErr.toString();
+      }
+    }
+
+    if (!codeTex) {
+      throw new Error(lastError || 'Aucun modele Gemini disponible pour cette cle.');
+    }
+
+    codeTex = codeTex.replace(/^```latex\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    if (!codeTex.includes('\\documentclass')) {
+      throw new Error('Code LaTeX incomplet genere par l IA.');
+    }
+
+    aiStudioState.generatedTex = codeTex;
+
+    // Affichage dans l editeur de texte
+    const editor = document.getElementById('studioTexEditor');
+    const stats = document.getElementById('studioTexStats');
+    if (editor) editor.value = codeTex;
+    if (stats) stats.textContent = codeTex.length + ' caracteres';
+
+    if (progressBar) progressBar.style.width = '85%';
+    if (progressMsg) progressMsg.textContent = 'Compilation du document PDF en cours...';
+    if (progressDetail) progressDetail.textContent = 'Creation du PDF haute resolution...';
+
+    // Compilation vers le PDF
+    await compileLatexToPdfBlob(codeTex);
+
+    if (progressBar) progressBar.style.width = '100%';
+    if (subStatus) subStatus.textContent = 'Document compile avec succes (' + aiStudioState.docType.toUpperCase() + ' - 2026-2027)';
+
+    document.getElementById('studioEmptyState')?.classList.add('hidden');
+    document.getElementById('studioActionsBar')?.classList.remove('hidden');
+    switchStudioTab('pdf');
+
+    if (window.lucide) window.lucide.createIcons();
+
+  } catch (err) {
+    console.error('Erreur studio :', err);
+    alert('Information : ' + err.message + '\n\nLe gabarit a ete injecte dans l onglet Code LaTeX.');
+    aiStudioState.generatedTex = baseTemplate.replace('[CORPS_EXERCICES]', '% Vos exercices apparaissent ici');
+    const editor = document.getElementById('studioTexEditor');
+    if (editor) editor.value = aiStudioState.generatedTex;
+    document.getElementById('studioEmptyState')?.classList.add('hidden');
+    document.getElementById('studioActionsBar')?.classList.remove('hidden');
+    switchStudioTab('tex');
+  } finally {
+    if (btn) btn.disabled = false;
+    progressBox?.classList.add('hidden');
+    if (progressBar) progressBar.style.width = '0%';
+  }
+}
+
+/**
+ * Service de Compilation Cloud LaTeX vers PDF (Multi-serveurs avec rendu secours natif)
+ */
+async function compileLatexToPdfBlob(texCode) {
+  const iframe = document.getElementById('studioPdfIframe');
+  const emptyPrompt = document.getElementById('studioEmptyState');
+
+  // Tentative 1 : YtoTech LaTeX Cloud (Service JSON rapide)
+  try {
+    const resp1 = await fetch('https://latex.ytotech.com/builds/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        compiler: 'pdflatex',
+        resources: [{ content: texCode, main: true }]
+      })
+    });
+
+    if (resp1.ok) {
+      const pdfBlob = await resp1.blob();
+      if (aiStudioState.compiledPdfBlobUrl) {
+        URL.revokeObjectURL(aiStudioState.compiledPdfBlobUrl);
+      }
+      aiStudioState.compiledPdfBlobUrl = URL.createObjectURL(pdfBlob);
+      if (iframe) {
+        iframe.src = aiStudioState.compiledPdfBlobUrl;
+        iframe.classList.remove('hidden');
+      }
+      emptyPrompt?.classList.add('hidden');
+      return;
+    }
+  } catch (err1) {
+    console.warn('Compilateur 1 indisponible, bascule sur compilateur 2...', err1);
+  }
+
+  // Tentative 2 : LaTeX-Online (FormData)
+  try {
+    const formData = new FormData();
+    const texBlob = new Blob([texCode], { type: 'application/x-tex' });
+    formData.append('file', texBlob, 'document.tex');
+
+    const resp2 = await fetch('https://latexonline.cc/compile?target=document.tex', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (resp2.ok) {
+      const pdfBlob = await resp2.blob();
+      if (aiStudioState.compiledPdfBlobUrl) {
+        URL.revokeObjectURL(aiStudioState.compiledPdfBlobUrl);
+      }
+      aiStudioState.compiledPdfBlobUrl = URL.createObjectURL(pdfBlob);
+      if (iframe) {
+        iframe.src = aiStudioState.compiledPdfBlobUrl;
+        iframe.classList.remove('hidden');
+      }
+      emptyPrompt?.classList.add('hidden');
+      return;
+    }
+  } catch (err2) {
+    console.warn('Serveurs de compilation distants non joignables.', err2);
+  }
+
+  // Secours garanti : Rendu visuel propre directement dans l iframe
+  renderFallbackHtmlPdf(texCode);
+}
+
+function renderFallbackHtmlPdf(texCode) {
+  const iframe = document.getElementById('studioPdfIframe');
+  const emptyPrompt = document.getElementById('studioEmptyState');
+  if (!iframe) return;
+
+  let bodyText = texCode;
+  const m = texCode.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
+  if (m) bodyText = m[1];
+
+  const htmlDoc = `
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+      <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+      <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 2.5cm; color: #0f172a; line-height: 1.6; max-width: 800px; margin: 0 auto; background: #fff; }
+        .header { border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px; }
+        h1, h2, h3 { font-family: Georgia, serif; color: #0f172a; }
+        @media print { body { padding: 1cm; max-width: 100%; } }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div style="font-size: 11px; font-weight: bold; color: #4338ca;">MATEX COTE D'IVOIRE - REFERENTIEL PEDAGOGIQUE 2026-2027</div>
+        <h2 style="margin: 6px 0 0 0; text-transform: uppercase;">${aiStudioState.docType.toUpperCase()} DE MATHEMATIQUES</h2>
+      </div>
+      <div>
+        <pre style="white-space: pre-wrap; font-family: inherit; font-size: 13px;">${escapeHtml(bodyText)}</pre>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob([htmlDoc], { type: 'text/html' });
+  if (aiStudioState.compiledPdfBlobUrl) {
+    URL.revokeObjectURL(aiStudioState.compiledPdfBlobUrl);
+  }
+  aiStudioState.compiledPdfBlobUrl = URL.createObjectURL(blob);
+  iframe.src = aiStudioState.compiledPdfBlobUrl;
+  iframe.classList.remove('hidden');
+  emptyPrompt?.classList.add('hidden');
+}
+
+function recompileStudioDocument() {
+  const code = document.getElementById('studioTexEditor')?.value || aiStudioState.generatedTex;
+  if (!code) return;
+  const btn = document.getElementById('btnStudioRecompile');
+  if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="h-3.5 w-3.5 animate-spin"></i> Recompilation...';
+  if (window.lucide) window.lucide.createIcons();
+
+  compileLatexToPdfBlob(code).finally(() => {
+    if (btn) btn.innerHTML = '<i data-lucide="refresh-cw" class="h-3.5 w-3.5 text-indigo-600"></i> <span>Recompiler</span>';
+    if (window.lucide) window.lucide.createIcons();
+  });
+}
+
+function switchStudioTab(tab) {
+  aiStudioState.currentTab = tab;
+  const btnPdf = document.getElementById('tabStudioPdf');
+  const btnTex = document.getElementById('tabStudioTex');
+  const panelPdf = document.getElementById('studioPanelPdf');
+  const panelTex = document.getElementById('studioPanelTex');
+
+  if (tab === 'pdf') {
+    btnPdf?.classList.add('bg-white', 'text-slate-900', 'shadow-xs');
+    btnPdf?.classList.remove('text-slate-600');
+    btnTex?.classList.remove('bg-white', 'text-slate-900', 'shadow-xs');
+    btnTex?.classList.add('text-slate-600');
+    panelPdf?.classList.remove('hidden');
+    panelTex?.classList.add('hidden');
+  } else {
+    btnTex?.classList.add('bg-white', 'text-slate-900', 'shadow-xs');
+    btnTex?.classList.remove('text-slate-600');
+    btnPdf?.classList.remove('bg-white', 'text-slate-900', 'shadow-xs');
+    btnPdf?.classList.add('text-slate-600');
+    panelTex?.classList.remove('hidden');
+    panelPdf?.classList.add('hidden');
+  }
+}
+
+function copyStudioTexCode() {
+  const code = document.getElementById('studioTexEditor')?.value || aiStudioState.generatedTex;
+  if (!code) return;
+  navigator.clipboard.writeText(code);
+  const btn = document.getElementById('btnCopyStudioTex');
+  if (btn) {
+    btn.innerHTML = '<i data-lucide="check" class="h-3.5 w-3.5 text-emerald-600"></i> Copie !';
+    setTimeout(() => {
+      btn.innerHTML = '<i data-lucide="copy" class="h-3.5 w-3.5"></i> Copier le Code';
+      if (window.lucide) window.lucide.createIcons();
+    }, 2000);
+    if (window.lucide) window.lucide.createIcons();
+  }
+}
+
+function downloadStudioTexFile() {
+  const code = document.getElementById('studioTexEditor')?.value || aiStudioState.generatedTex;
+  if (!code) return;
+  downloadTextFile(`${aiStudioState.docType}_${Date.now()}.tex`, code, 'application/x-tex');
+}
+
+function downloadStudioPdf() {
+  if (aiStudioState.compiledPdfBlobUrl) {
+    const a = document.createElement('a');
+    a.href = aiStudioState.compiledPdfBlobUrl;
+    a.download = `${aiStudioState.docType}_evaluation_MATEX.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } else {
+    alert('Veuillez d abord lancer la transcription et compilation.');
+  }
+}
+
+function printStudioPdf() {
+  const iframe = document.getElementById('studioPdfIframe');
+  if (iframe && iframe.src) {
+    try {
+      iframe.contentWindow.print();
+    } catch (e) {
+      window.open(iframe.src, '_blank');
+    }
+  } else {
+    alert('Aucun document a imprimer.');
+  }
+}
+
+window.setAiDocumentType = setAiDocumentType;
+window.toggleApiKeyModal = toggleApiKeyModal;
+window.saveUserApiKey = saveUserApiKey;
+window.runPhotoToPdfPipeline = runPhotoToPdfPipeline;
+window.recompileStudioDocument = recompileStudioDocument;
+window.switchStudioTab = switchStudioTab;
+window.copyStudioTexCode = copyStudioTexCode;
+window.downloadStudioTexFile = downloadStudioTexFile;
+window.downloadStudioPdf = downloadStudioPdf;
+window.printStudioPdf = printStudioPdf;
 
 window.isTexDocument = isTexDocument;
 window.getDocLatexCode = getDocLatexCode;
