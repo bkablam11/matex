@@ -1,34 +1,18 @@
 /**
  * ==========================================================================
- * BACKEND GOOGLE APPS SCRIPT - MATEX CÔTE D'IVOIRE
- * Synchronisation Automatique : Google Drive, Google Sheets & Bibliothèque MATEX
+ * BACKEND GOOGLE APPS SCRIPT - MATEX COTE D'IVOIRE
+ * Synchronisation Automatique : Google Drive, Google Sheets & Bibliotheque MATEX
+ * Architecture haute performance avec CacheService et 13 colonnes strictes (A a M)
  * ==========================================================================
- * 
- * Dossier Google Drive Officiel :
- * ID  : 1jWAn2ZHD4vU8NAypKcsXI5Ias8oIZFYF
- * URL : https://drive.google.com/drive/folders/1jWAn2ZHD4vU8NAypKcsXI5Ias8oIZFYF?usp=sharing
- * 
- * Feuille Google Sheets Officielle :
- * ID  : 100kYZ-lrTW069edLrur_RBfqxsvu288jeES5zQ-tZTI
- * URL : https://docs.google.com/spreadsheets/d/100kYZ-lrTW069edLrur_RBfqxsvu288jeES5zQ-tZTI/edit?usp=sharing
- * 
- * Instructions de Déploiement :
- * 1. Ouvrir votre feuille Google Sheets MATEX
- * 2. Cliquer sur Extensions > Apps Script
- * 3. Remplacer tout le code par ce fichier Code.gs
- * 4. Déployer en tant qu'Application Web (Web App) :
- *    - Exécuter en tant que : "Moi" (votre compte Google)
- *    - Qui a accès : "Tout le monde" (Anyone)
- * 5. Pour tester directement dans Apps Script :
- *    - Choisir la fonction "TESTER_CONNEXION_IMMEDIATE" dans la barre d'outils et cliquer sur "Exécuter" !
  */
 
 const SPREADSHEET_ID = "100kYZ-lrTW069edLrur_RBfqxsvu288jeES5zQ-tZTI";
 const DRIVE_FOLDER_ID = "1jWAn2ZHD4vU8NAypKcsXI5Ias8oIZFYF";
+const CACHE_CATALOG_KEY = "matex_catalog_json_v1";
+const CACHE_TTL_SECONDS = 600; // 10 minutes
 
 /**
- * FONCTION DE TEST AUTONOME (Exécutable directement dans l'éditeur Google Apps Script)
- * Cliquez sur cette fonction dans la liste déroulante et appuyez sur "Exécuter" pour tester en 1 clic !
+ * Fonction de test autonome executable directement dans l'editeur Apps Script
  */
 function TESTER_CONNEXION_IMMEDIATE() {
   try {
@@ -37,122 +21,175 @@ function TESTER_CONNEXION_IMMEDIATE() {
     if (!sheet) {
       sheet = ss.insertSheet("Documents_MATEX");
       sheet.appendRow([
-        "Date de Dépôt", "Titre", "Parcours", "Classe", "Leçon / Chapitre",
-        "Type", "Domaine", "Auteur", "Établissement", "Description",
+        "Date de Depot", "Titre", "Parcours", "Classe", "Lecon / Chapitre",
+        "Type", "Domaine", "Auteur", "Etablissement", "Description",
         "Nom du Fichier", "Lien Google Drive", "ID Fichier Drive"
       ]);
       sheet.getRange("A1:M1").setFontWeight("bold").setBackground("#059669").setFontColor("#ffffff");
     }
 
-    // Activer l'onglet Documents_MATEX pour qu'il s'affiche au premier plan
     ss.setActiveSheet(sheet);
 
-    // Supprimer ou renommer Feuille 1 si elle est vide pour éviter toute confusion
-    try {
-      const defaultSheet = ss.getSheetByName("Feuille 1") || ss.getSheetByName("Sheet1");
-      if (defaultSheet && defaultSheet.getLastRow() === 0) {
-        // Laisser intact ou déplacer en arrière-plan
-      }
-    } catch (e) {}
-
-    // Tester Google Drive
     const rootFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-    const testBlob = Utilities.newBlob("Fichier de test unitaire MATEX - Connexion opérationnelle.", "text/plain", "test_connexion_" + Date.now() + ".txt");
+    const testBlob = Utilities.newBlob("Fichier de test unitaire MATEX - Connexion operationnelle.", "text/plain", "test_connexion_" + Date.now() + ".txt");
     const testDriveFile = rootFolder.createFile(testBlob);
     try {
       testDriveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     } catch (e) {}
 
-    // Ajouter la ligne de test certifiée
     const now = new Date().toLocaleString("fr-FR", { timeZone: "Africa/Abidjan" });
     sheet.appendRow([
       now,
-      "✅ TEST DE SYNCHRONISATION MATEX",
+      "[TEST] Synchronisation MATEX",
       "college",
-      "Classe de Troisième (3e)",
-      "Test Système",
+      "Classe de Troisieme (3e)",
+      "Test Systeme",
       "cours",
-      "Algèbre & Analyse",
-      "M. Blanchard (Admin MATEX)",
-      "Centre National MATEX",
-      "Ligne de validation confirmant la communication entre MATEX, Google Sheets et Google Drive.",
+      "Arithmetique & Algebre",
+      "Admin MATEX",
+      "Centre National MATEX CI",
+      "Validation de communication entre MATEX, Sheets et Drive.",
       testDriveFile.getName(),
       testDriveFile.getUrl(),
       testDriveFile.getId()
     ]);
 
-    Logger.log("=================================================");
-    Logger.log("🎉 SUCCÈS TOTAL DU TEST !");
-    Logger.log("1. Google Sheets : 1 ligne ajoutée dans l'onglet 'Documents_MATEX'");
-    Logger.log("2. Google Drive  : 1 fichier test créé (" + testDriveFile.getUrl() + ")");
-    Logger.log("=================================================");
+    try {
+      CacheService.getScriptCache().remove(CACHE_CATALOG_KEY);
+    } catch (cErr) {}
+
+    Logger.log("SUCCES DU TEST");
+    Logger.log("1. Google Sheets : Ligne ajoutee dans Documents_MATEX (13 colonnes)");
+    Logger.log("2. Google Drive  : Fichier cree (" + testDriveFile.getUrl() + ")");
     return "SUCCESS";
   } catch (err) {
-    Logger.log("❌ ERREUR DU TEST : " + err.toString());
+    Logger.log("ERREUR DU TEST : " + err.toString());
     throw err;
   }
 }
 
 /**
- * Gestion des requêtes GET (Console de Diagnostic & API JSON)
+ * Gestion des requetes GET (API JSON avec cache & lecture TeX a la demande)
  */
 function doGet(e) {
   try {
     e = e || { parameter: {} };
     const action = (e.parameter && e.parameter.action) || (e.parameter && e.parameter.test ? "test" : "console");
 
-    // 1. Action : API de récupération des documents
+    // 1. API : Recuperation du catalogue de documents (Colonnes A a M)
     if (action === "get_documents") {
+      const cache = CacheService.getScriptCache();
+      const cached = cache.get(CACHE_CATALOG_KEY);
+      if (cached) {
+        return ContentService.createTextOutput(cached).setMimeType(ContentService.MimeType.JSON);
+      }
+
       const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
       const sheet = ss.getSheetByName("Documents_MATEX");
       if (!sheet) {
-        return ContentService.createTextOutput(JSON.stringify({ success: true, documents: [] })).setMimeType(ContentService.MimeType.JSON);
+        const emptyOutput = JSON.stringify({ success: true, count: 0, documents: [] });
+        return ContentService.createTextOutput(emptyOutput).setMimeType(ContentService.MimeType.JSON);
       }
 
       const rows = sheet.getDataRange().getValues();
       const documents = [];
+
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         if (!row[1]) continue;
+
+        const driveUrl = row[11] ? String(row[11]) : "";
+        const driveFileId = row[12] ? String(row[12]) : "";
+
         documents.push({
-          date: row[0],
-          title: row[1],
-          cycle: row[2],
-          classe: row[3],
-          chapter: row[4],
-          type: row[5],
-          domain: row[6],
-          author: { name: row[7], institution: row[8] },
-          description: row[9],
-          fileName: row[10] || "",
-          driveUrl: row[11] || "",
-          driveFileId: row[12] || ""
+          id: "doc-sheet-" + i,
+          date: row[0] ? String(row[0]) : "",
+          title: String(row[1] || ""),
+          cycle: String(row[2] || "college"),
+          classe: String(row[3] || ""),
+          chapter: String(row[4] || ""),
+          type: String(row[5] || "cours"),
+          domain: String(row[6] || ""),
+          author: {
+            name: String(row[7] || "Enseignant"),
+            institution: String(row[8] || "Etablissement National"),
+            verifiedTeacher: true
+          },
+          description: String(row[9] || ""),
+          fileName: String(row[10] || (row[1] + ".pdf")),
+          pdfFileName: String(row[10] || (row[1] + ".pdf")),
+          driveUrl: driveUrl || ("https://drive.google.com/drive/folders/" + DRIVE_FOLDER_ID),
+          pdfDriveUrl: driveUrl,
+          driveFileId: driveFileId,
+          hasPdfSource: Boolean(driveUrl && driveUrl.indexOf("http") === 0),
+          hasTexSource: true
         });
       }
 
-      return ContentService.createTextOutput(JSON.stringify({
+      const payloadString = JSON.stringify({
         success: true,
         count: documents.length,
+        timestamp: Date.now(),
         documents: documents
-      })).setMimeType(ContentService.MimeType.JSON);
+      });
+
+      try {
+        cache.put(CACHE_CATALOG_KEY, payloadString, CACHE_TTL_SECONDS);
+      } catch (cacheErr) {}
+
+      return ContentService.createTextOutput(payloadString).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 2. Action : Lancement d'un test direct via URL (?action=test ou ?test=1)
+    // 2. API : Recuperation a la demande du code source TeX depuis Drive
+    if (action === "get_tex_content") {
+      let fileId = e.parameter.fileId;
+
+      if (!fileId && e.parameter.driveUrl) {
+        const rawUrl = e.parameter.driveUrl;
+        const m = rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/id=([a-zA-Z0-9_-]+)/);
+        if (m) fileId = m[1];
+      }
+
+      if (!fileId) {
+        return ContentService.createTextOutput(JSON.stringify({
+          success: false,
+          error: "Parametre fileId ou driveUrl manquant"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+
+      try {
+        const file = DriveApp.getFileById(fileId);
+        const texContent = file.getBlob().getDataAsString("UTF-8");
+        return ContentService.createTextOutput(JSON.stringify({
+          success: true,
+          fileId: fileId,
+          fileName: file.getName(),
+          content: texContent
+        })).setMimeType(ContentService.MimeType.JSON);
+      } catch (errDrive) {
+        return ContentService.createTextOutput(JSON.stringify({
+          success: false,
+          error: "Erreur lecture Drive : " + errDrive.toString()
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+
+    // 3. Execution d'un test direct par URL (?action=test)
     let testResult = null;
     if (action === "test") {
       try {
         TESTER_CONNEXION_IMMEDIATE();
-        testResult = "Le test d'écriture a été exécuté avec SUCCÈS ! Une nouvelle ligne apparaît dans votre feuille Google Sheets et un fichier a été créé dans Google Drive.";
+        testResult = "Test effectue avec succes. Une ligne a ete ajoutee et le cache a ete purge.";
       } catch (tErr) {
         testResult = "Erreur lors du test : " + tErr.toString();
       }
     }
 
-    // 3. Format JSON pur si demandé explicitement
+    // 4. Format JSON pur sur demande
     if (e.parameter && e.parameter.format === "json") {
       return ContentService.createTextOutput(JSON.stringify({
         status: "success",
-        service: "MATEX Google Apps Script Backend (Drive & Sheets Synced)",
+        service: "MATEX Apps Script Backend (13 colonnes strictes)",
         spreadsheetId: SPREADSHEET_ID,
         driveFolderId: DRIVE_FOLDER_ID,
         testResult: testResult,
@@ -160,7 +197,7 @@ function doGet(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 4. Par défaut en visite navigateur : Interface Web de Diagnostic Éléguante & Conviviale
+    // 5. Console de diagnostic Web
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const docSheet = ss.getSheetByName("Documents_MATEX");
     const rowCount = docSheet ? Math.max(0, docSheet.getLastRow() - 1) : 0;
@@ -176,7 +213,7 @@ function doGet(e) {
           <td style="padding: 10px; font-weight: bold; color: #1e293b;">${r[1]}</td>
           <td style="padding: 10px; color: #475569;">${r[3]}</td>
           <td style="padding: 10px; color: #475569;">${r[7]}</td>
-          <td style="padding: 10px; color: #0284c7;"><a href="${r[11]}" target="_blank" style="color: #0284c7; text-decoration: underline;">Voir Drive</a></td>
+          <td style="padding: 10px; color: #0284c7;"><a href="${r[11]}" target="_blank" style="color: #0284c7; text-decoration: underline;">Voir Fichier</a></td>
         </tr>
       `).join("");
     }
@@ -187,92 +224,76 @@ function doGet(e) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Console Backend MATEX • Drive & Sheets</title>
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <title>Console Backend MATEX</title>
         <style>
-          body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 24px; line-height: 1.5; }
-          .container { max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; overflow: hidden; }
-          .header { background: linear-gradient(135deg, #1e1b4b, #312e81); color: #ffffff; padding: 32px 28px; }
-          .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; background: #22c55e; color: #ffffff; margin-bottom: 12px; }
-          .title { margin: 0 0 8px 0; font-size: 24px; font-weight: 800; }
-          .subtitle { margin: 0; color: #c7d2fe; font-size: 14px; }
-          .body { padding: 28px; }
-          .alert { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #1e40af; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 24px; line-height: 1.5; }
+          .container { max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; overflow: hidden; }
+          .header { background: #1e1b4b; color: #ffffff; padding: 28px; }
+          .title { margin: 0 0 8px 0; font-size: 22px; font-weight: 800; }
+          .subtitle { margin: 0; color: #c7d2fe; font-size: 13px; }
+          .body { padding: 24px; }
+          .alert { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; margin-bottom: 20px; font-size: 13px; color: #1e40af; }
           .alert-success { background: #f0fdf4; border-color: #bbf7d0; color: #166534; font-weight: 600; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-          .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; }
-          .card-title { font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
-          .card-value { font-size: 20px; font-weight: 800; color: #0f172a; }
-          .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-          .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: 0.2s; border: none; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+          .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+          .card-title { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+          .card-value { font-size: 18px; font-weight: 800; color: #0f172a; }
+          .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+          .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; }
           .btn-primary { background: #4f46e5; color: #ffffff; }
-          .btn-primary:hover { background: #4338ca; }
           .btn-outline { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; }
-          .btn-outline:hover { background: #f1f5f9; }
-          table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-          th { padding: 10px; background: #f1f5f9; color: #475569; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
+          table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+          th { padding: 8px 10px; background: #f1f5f9; color: #475569; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <span class="badge">● Opérationnel & Synchronisé</span>
-            <h1 class="title">Console Google Apps Script • MATEX</h1>
-            <p class="subtitle">Liaison bidirectionnelle Google Drive, Google Sheets & Portail National</p>
+            <h1 class="title">Console Backend MATEX</h1>
+            <p class="subtitle">Liaison Google Drive, Google Sheets (13 colonnes) & Bibliotheque</p>
           </div>
           <div class="body">
-            
-            ${testResult ? `<div class="alert alert-success">🎉 ${testResult}</div>` : ''}
-
+            ${testResult ? `<div class="alert alert-success">${testResult}</div>` : ""}
             <div class="alert">
-              <strong>💡 OÙ SONT VOS DONNÉES ?</strong><br>
-              Dans votre feuille Google Sheets, vos ressources sont enregistrées dans l'onglet <strong>« Documents_MATEX »</strong> situé tout en bas à côté de « Feuille 1 ».
+              Onglet des ressources : <strong>Documents_MATEX</strong> (ID : ${SPREADSHEET_ID})
             </div>
-
             <div class="grid">
               <div class="card">
-                <div class="card-title">Feuille Google Sheets</div>
+                <div class="card-title">Documents references</div>
                 <div class="card-value">${rowCount} document(s)</div>
-                <p style="margin: 6px 0 0 0; font-size: 11px; color: #64748b;">Onglet : Documents_MATEX</p>
               </div>
               <div class="card">
-                <div class="card-title">Membres Inscrits</div>
+                <div class="card-title">Membres inscrits</div>
                 <div class="card-value">${memberCount} enseignant(s)</div>
-                <p style="margin: 6px 0 0 0; font-size: 11px; color: #64748b;">Onglet : Membres_MATEX</p>
               </div>
             </div>
-
-            <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin: 0 0 12px 0;">Actions & Tests Immédiats</h3>
             <div class="btn-group">
-              <a href="?action=test" class="btn btn-primary">🧪 Lancer un Test d'Écriture Immédiat</a>
-              <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit" target="_blank" class="btn btn-outline">📊 Ouvrir Google Sheets</a>
-              <a href="https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}" target="_blank" class="btn btn-outline">📁 Ouvrir Google Drive</a>
+              <a href="?action=test" class="btn btn-primary">Executer un test de synchronisation</a>
+              <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit" target="_blank" class="btn btn-outline">Ouvrir Google Sheets</a>
+              <a href="https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}" target="_blank" class="btn btn-outline">Ouvrir Google Drive</a>
             </div>
-
-            <h3 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin: 24px 0 12px 0;">Dernières Ressources Enregistrées</h3>
             ${rowCount > 0 ? `
               <table>
                 <thead>
                   <tr>
                     <th>Titre</th>
-                    <th>Niveau</th>
+                    <th>Classe</th>
                     <th>Auteur</th>
-                    <th>Fichier Drive</th>
+                    <th>Lien</th>
                   </tr>
                 </thead>
-                <tbody>
-                  ${recentRowsHtml}
-                </tbody>
+                <tbody>${recentRowsHtml}</tbody>
               </table>
-            ` : '<p style="font-size: 13px; color: #94a3b8;">Aucun document pour le moment. Cliquez sur « Lancer un Test d\'Écriture Immédiat » ci-dessus.</p>'}
-
+            ` : "<p style='font-size: 12px; color: #94a3b8;'>Aucun document pour le moment.</p>"}
           </div>
         </div>
       </body>
       </html>
     `;
 
-    return HtmlService.createHtmlOutput(html).setTitle("Console MATEX • Backend Connecté").setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    return HtmlService.createHtmlOutput(html)
+      .setTitle("Console MATEX")
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({
@@ -283,7 +304,7 @@ function doGet(e) {
 }
 
 /**
- * Gestion des requêtes POST (Dépôt de document avec upload Drive, Adhésion membre, Don solidaire)
+ * Gestion des requetes POST (Depot de document, Adhesion membre, Don solidaire)
  */
 function doPost(e) {
   try {
@@ -295,99 +316,108 @@ function doPost(e) {
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
-    // =========================================================================
-    // 1. DÉPÔT DE DOCUMENT AVEC TÉLÉVERSEMENT AUTOMATIQUE DANS GOOGLE DRIVE
-    // =========================================================================
+    // 1. DEPOT DE DOCUMENT AVEC TELEVERSEMENT AUTOMATIQUE DANS GOOGLE DRIVE
     if (action === "submit_doc" || data.type === "document") {
-      let driveFileUrl = payload.driveUrl || "";
-      let driveFileId = "";
-      let uploadedFileName = payload.fileName || "";
+      let rootFolder;
+      try {
+        rootFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+      } catch (folderErr) {
+        rootFolder = DriveApp.getRootFolder();
+      }
 
-      // Si un fichier en base64 est transmis depuis le site MATEX
-      if (payload.fileBase64) {
+      let targetFolder = rootFolder;
+      let subFolderName = "00_Ressources_Diverses";
+      if (payload.cycle === "primaire") subFolderName = "01_Primaire_CP1_CM2";
+      else if (payload.cycle === "college") subFolderName = "02_College_6e_3e";
+      else if (payload.cycle === "lycee") subFolderName = "03_Lycee_2nde_Tle";
+      else if (payload.cycle === "superieur") subFolderName = "04_Superieur_L1_M2";
+
+      try {
+        const existingSubFolders = rootFolder.getFoldersByName(subFolderName);
+        if (existingSubFolders.hasNext()) {
+          targetFolder = existingSubFolders.next();
+        } else {
+          targetFolder = rootFolder.createFolder(subFolderName);
+          try {
+            targetFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          } catch (e) {}
+        }
+      } catch (errSub) {
+        targetFolder = rootFolder;
+      }
+
+      let pdfDriveUrl = "";
+      let pdfDriveId = "";
+      let pdfFileName = payload.pdfFileName || payload.fileName || "";
+      let texDriveUrl = "";
+      let texDriveId = "";
+      let texFileName = payload.texFileName || "";
+
+      // 1.1 Televersement du fichier PDF
+      const pdfBase64 = payload.pdfBase64 || payload.fileBase64;
+      if (pdfBase64 && (!payload.fileMimeType || payload.fileMimeType === "application/pdf" || pdfFileName.toLowerCase().endsWith(".pdf"))) {
         try {
-          let base64Data = payload.fileBase64;
-          if (base64Data.indexOf("base64,") > -1) {
-            base64Data = base64Data.split("base64,")[1];
+          let b64 = pdfBase64;
+          if (b64.indexOf("base64,") > -1) {
+            b64 = b64.split("base64,")[1];
           }
-          const decodedBytes = Utilities.base64Decode(base64Data);
-          uploadedFileName = payload.fileName || (payload.title ? payload.title.replace(/[^a-zA-Z0-9_-]/g, "_") + ".pdf" : "document_matex.pdf");
-          const mimeType = payload.fileMimeType || "application/pdf";
-          const blob = Utilities.newBlob(decodedBytes, mimeType, uploadedFileName);
-
-          // Récupération du dossier racine MATEX Drive
-          let rootFolder;
+          const decodedPdfBytes = Utilities.base64Decode(b64);
+          if (!pdfFileName) {
+            pdfFileName = (payload.title ? payload.title.replace(/[^a-zA-Z0-9_-]/g, "_") : "document") + ".pdf";
+          }
+          const pdfBlob = Utilities.newBlob(decodedPdfBytes, "application/pdf", pdfFileName);
+          const pdfFile = targetFolder.createFile(pdfBlob);
           try {
-            rootFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-          } catch (folderErr) {
-            rootFolder = DriveApp.getRootFolder();
-          }
-
-          // Organisation automatique par sous-dossier selon le Cycle d'enseignement
-          let targetFolder = rootFolder;
-          let subFolderName = "00_Ressources_Diverses";
-          if (payload.cycle === "primaire") subFolderName = "01_Primaire_CP1_CM2";
-          else if (payload.cycle === "college") subFolderName = "02_College_6e_3e";
-          else if (payload.cycle === "lycee") subFolderName = "03_Lycee_2nde_Tle";
-          else if (payload.cycle === "superieur") subFolderName = "04_Superieur_L1_M2";
-
-          const existingSubFolders = rootFolder.getFoldersByName(subFolderName);
-          if (existingSubFolders.hasNext()) {
-            targetFolder = existingSubFolders.next();
-          } else {
-            targetFolder = rootFolder.createFolder(subFolderName);
-          }
-
-          // Création du fichier dans le dossier Drive
-          const driveFile = targetFolder.createFile(blob);
-          
-          // Définition des droits d'accès public en lecture (pour consultation et téléchargement)
-          try {
-            driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-          } catch (permErr) {
-            // Ignorer si les droits du domaine s'appliquent déjà
-          }
-
-          driveFileUrl = driveFile.getUrl();
-          driveFileId = driveFile.getId();
-
-        } catch (uploadErr) {
-          driveFileUrl = "Erreur Upload Drive : " + uploadErr.toString();
+            pdfFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          } catch (pErr) {}
+          pdfDriveUrl = pdfFile.getUrl();
+          pdfDriveId = pdfFile.getId();
+        } catch (pdfErr) {
+          pdfDriveUrl = "Erreur PDF : " + pdfErr.toString();
         }
       }
 
-      // Si aucun fichier direct n'est uploadé mais qu'un code LaTeX est fourni
-      if (!driveFileUrl && payload.latexCode) {
+      // 1.2 Televersement du fichier source TeX dans Google Drive
+      const texBase64 = payload.texBase64;
+      const latexCode = payload.latexCode || payload.latexContent;
+      if (texBase64 || latexCode) {
         try {
-          const rootFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-          const texBlob = Utilities.newBlob(payload.latexCode, "text/plain", (payload.title || "document").replace(/[^a-zA-Z0-9_-]/g, "_") + ".tex");
-          const texFile = rootFolder.createFile(texBlob);
+          if (!texFileName) {
+            texFileName = (payload.title ? payload.title.replace(/[^a-zA-Z0-9_-]/g, "_") : "source") + ".tex";
+          }
+          let texBlob;
+          if (texBase64) {
+            let b64Tex = texBase64;
+            if (b64Tex.indexOf("base64,") > -1) {
+              b64Tex = b64Tex.split("base64,")[1];
+            }
+            const decodedTexBytes = Utilities.base64Decode(b64Tex);
+            texBlob = Utilities.newBlob(decodedTexBytes, "text/plain", texFileName);
+          } else {
+            texBlob = Utilities.newBlob(latexCode, "text/plain", texFileName);
+          }
+          const texFile = targetFolder.createFile(texBlob);
           try {
             texFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-          } catch (p) {}
-          driveFileUrl = texFile.getUrl();
-          driveFileId = texFile.getId();
-        } catch (texErr) {}
+          } catch (tErr) {}
+          texDriveUrl = texFile.getUrl();
+          texDriveId = texFile.getId();
+        } catch (texUploadErr) {
+          texDriveUrl = "Erreur TEX : " + texUploadErr.toString();
+        }
       }
 
-      // Enregistrement dans l'onglet "Documents_MATEX" de la feuille Google Sheets
+      const driveUrl = pdfDriveUrl || texDriveUrl || targetFolder.getUrl() || ("https://drive.google.com/drive/folders/" + DRIVE_FOLDER_ID);
+      const driveFileId = pdfDriveId || texDriveId || "";
+
+      // Enregistrement STRICTEMENT limite aux 13 colonnes officielles (A a M)
       let sheet = ss.getSheetByName("Documents_MATEX");
       if (!sheet) {
         sheet = ss.insertSheet("Documents_MATEX");
         sheet.appendRow([
-          "Date de Dépôt",
-          "Titre",
-          "Parcours",
-          "Classe",
-          "Leçon / Chapitre",
-          "Type",
-          "Domaine",
-          "Auteur",
-          "Établissement",
-          "Description",
-          "Nom du Fichier",
-          "Lien Google Drive",
-          "ID Fichier Drive"
+          "Date de Depot", "Titre", "Parcours", "Classe", "Lecon / Chapitre",
+          "Type", "Domaine", "Auteur", "Etablissement", "Description",
+          "Nom du Fichier", "Lien Google Drive", "ID Fichier Drive"
         ]);
         sheet.getRange("A1:M1").setFontWeight("bold").setBackground("#059669").setFontColor("#ffffff");
       }
@@ -402,40 +432,40 @@ function doPost(e) {
         payload.chapter || "",
         payload.type || "",
         payload.domain || "",
-        payload.author?.name || payload.authorName || "",
-        payload.author?.institution || payload.institution || "",
+        (payload.author && payload.author.name) || payload.authorName || "",
+        (payload.author && payload.author.institution) || payload.institution || "",
         payload.description || "",
-        uploadedFileName || "Non spécifié",
-        driveFileUrl || ("https://drive.google.com/drive/folders/" + DRIVE_FOLDER_ID),
+        pdfFileName || texFileName || "document.pdf",
+        pdfDriveUrl || driveUrl,
         driveFileId || ""
       ]);
 
+      // Invalidation immediate du cache memoire
+      try {
+        CacheService.getScriptCache().remove(CACHE_CATALOG_KEY);
+      } catch (cPurgeErr) {}
+
       return ContentService.createTextOutput(JSON.stringify({
         success: true,
-        message: "Ressource pédagogique enregistrée et stockée avec succès sur Google Drive et Google Sheets",
-        driveUrl: driveFileUrl || ("https://drive.google.com/drive/folders/" + DRIVE_FOLDER_ID),
-        driveFileId: driveFileId,
-        fileName: uploadedFileName
+        message: "Ressource enregistree avec succes",
+        driveUrl: driveUrl,
+        pdfDriveUrl: pdfDriveUrl,
+        pdfDriveId: pdfDriveId,
+        texDriveUrl: texDriveUrl,
+        texDriveId: texDriveId,
+        driveFolderUrl: targetFolder.getUrl(),
+        subFolder: subFolderName
       })).setMimeType(ContentService.MimeType.JSON);
 
-    // =========================================================================
-    // 2. ADHÉSION D'UN NOUVEAU MEMBRE MATEX
-    // =========================================================================
+    // 2. ADHESION D'UN NOUVEAU MEMBRE
     } else if (action === "join_member" || data.type === "member") {
       let sheet = ss.getSheetByName("Membres_MATEX");
       if (!sheet) {
         sheet = ss.insertSheet("Membres_MATEX");
         sheet.appendRow([
-          "Date & Heure",
-          "Nom & Prénoms",
-          "Numéro WhatsApp",
-          "Email",
-          "Établissement",
-          "Ville",
-          "Niveaux Enseignés",
-          "Niveau LaTeX",
-          "Motivation",
-          "Statut"
+          "Date & Heure", "Nom & Prenoms", "Numero WhatsApp", "Email",
+          "Etablissement", "Ville", "Niveaux Enseignes", "Niveau LaTeX",
+          "Motivation", "Statut"
         ]);
         sheet.getRange("A1:J1").setFontWeight("bold").setBackground("#4338ca").setFontColor("#ffffff");
       }
@@ -455,16 +485,13 @@ function doPost(e) {
 
       return ContentService.createTextOutput(JSON.stringify({
         success: true,
-        message: "Membre MATEX enregistré avec succès"
+        message: "Membre enregistre avec succes"
       })).setMimeType(ContentService.MimeType.JSON);
 
-    // =========================================================================
-    // 3. ENREGISTREMENT D'UN DON SOLIDAIRE AVEC PREUVE SUR DRIVE
-    // =========================================================================
+    // 3. ENREGISTREMENT D'UN DON SOLIDAIRE
     } else if (action === "donate" || data.type === "donation") {
       let proofDriveUrl = "";
 
-      // Téléversement de la capture de paiement dans le dossier "Preuves_Dons"
       if (payload.proofDataUrl) {
         try {
           const rootFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
@@ -485,7 +512,7 @@ function doPost(e) {
           const proofFile = proofFolder.createFile(proofBlob);
           proofDriveUrl = proofFile.getUrl();
         } catch (pErr) {
-          proofDriveUrl = "Capture reçue";
+          proofDriveUrl = "Capture recue";
         }
       }
 
@@ -493,14 +520,8 @@ function doPost(e) {
       if (!sheet) {
         sheet = ss.insertSheet("Dons_MATEX");
         sheet.appendRow([
-          "Date & Heure",
-          "Nom du Donateur",
-          "Numéro WhatsApp",
-          "Montant (FCFA)",
-          "Opérateur",
-          "Bénéficiaire Officiel",
-          "Preuve de Paiement (Lien Drive)",
-          "Statut Validation"
+          "Date & Heure", "Nom du Donateur", "Numero WhatsApp", "Montant (FCFA)",
+          "Operateur", "Beneficiaire Officiel", "Preuve de Paiement (Lien Drive)", "Statut Validation"
         ]);
         sheet.getRange("A1:H1").setFontWeight("bold").setBackground("#d97706").setFontColor("#ffffff");
       }
@@ -513,12 +534,12 @@ function doPost(e) {
         payload.operator || "Wave",
         "KABLAM EDJABROU ULRICH BLANCHARD (07 48 78 22 05)",
         proofDriveUrl || payload.proofFileName || "Preuve fournie",
-        "En attente de vérification"
+        "En attente de verification"
       ]);
 
       return ContentService.createTextOutput(JSON.stringify({
         success: true,
-        message: "Don solidaire MATEX enregistré avec succès",
+        message: "Don enregistre avec succes",
         proofDriveUrl: proofDriveUrl
       })).setMimeType(ContentService.MimeType.JSON);
     }

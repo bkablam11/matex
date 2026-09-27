@@ -178,3 +178,44 @@ body {
     transform: none !important;
   }
 }
+
+/* Animations et Défilement Continu pour le Carrousel Photos (De la gauche vers la droite) */
+@keyframes marqueeScrollLeftToRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScrollLeftToRight 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Styles d'impression pour les Fiches de Progression DPFC 2026-2027 */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #modalCurriculum, #modalCurriculum * {
+    visibility: visible;
+  }
+  #modalCurriculum {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    background: white !important;
+    padding: 0 !important;
+  }
+}
+
