@@ -1,8 +1,8 @@
 /**
  * ==========================================================================
  * BACKEND GOOGLE APPS SCRIPT - MATEX COTE D'IVOIRE
- * Synchronisation Automatique : Google Drive, Google Sheets & Bibliotheque MATEX
- * Architecture haute performance avec CacheService et 13 colonnes strictes (A a M)
+ * Synchronisation : Google Drive, Google Sheets (13 colonnes A a M) & Console Web
+ * Tableau de bord statistique des contributions enseignants
  * ==========================================================================
  */
 
@@ -12,7 +12,7 @@ const CACHE_CATALOG_KEY = "matex_catalog_json_v1";
 const CACHE_TTL_SECONDS = 600; // 10 minutes
 
 /**
- * Fonction de test autonome executable directement dans l'editeur Apps Script
+ * Fonction de test autonome executable dans l'editeur Apps Script
  */
 function TESTER_CONNEXION_IMMEDIATE() {
   try {
@@ -28,10 +28,8 @@ function TESTER_CONNEXION_IMMEDIATE() {
       sheet.getRange("A1:M1").setFontWeight("bold").setBackground("#059669").setFontColor("#ffffff");
     }
 
-    ss.setActiveSheet(sheet);
-
     const rootFolder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-    const testBlob = Utilities.newBlob("Fichier de test unitaire MATEX - Connexion operationnelle.", "text/plain", "test_connexion_" + Date.now() + ".txt");
+    const testBlob = Utilities.newBlob("Fichier de test unitaire MATEX.", "text/plain", "test_" + Date.now() + ".txt");
     const testDriveFile = rootFolder.createFile(testBlob);
     try {
       testDriveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -59,8 +57,7 @@ function TESTER_CONNEXION_IMMEDIATE() {
     } catch (cErr) {}
 
     Logger.log("SUCCES DU TEST");
-    Logger.log("1. Google Sheets : Ligne ajoutee dans Documents_MATEX (13 colonnes)");
-    Logger.log("2. Google Drive  : Fichier cree (" + testDriveFile.getUrl() + ")");
+    Logger.log("Google Sheets et Google Drive operationnels.");
     return "SUCCESS";
   } catch (err) {
     Logger.log("ERREUR DU TEST : " + err.toString());
@@ -69,14 +66,14 @@ function TESTER_CONNEXION_IMMEDIATE() {
 }
 
 /**
- * Gestion des requetes GET (API JSON avec cache & lecture TeX a la demande)
+ * Gestion des requetes GET (API JSON & Console Web avec Statistiques et Classement)
  */
 function doGet(e) {
   try {
     e = e || { parameter: {} };
     const action = (e.parameter && e.parameter.action) || (e.parameter && e.parameter.test ? "test" : "console");
 
-    // 1. API : Recuperation du catalogue de documents (Colonnes A a M)
+    // 1. API JSON : Recuperation du catalogue de documents (Colonnes A a M)
     if (action === "get_documents") {
       const cache = CacheService.getScriptCache();
       const cached = cache.get(CACHE_CATALOG_KEY);
@@ -140,7 +137,7 @@ function doGet(e) {
       return ContentService.createTextOutput(payloadString).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 2. API : Recuperation a la demande du code source TeX depuis Drive
+    // 2. API JSON : Lecture du code source TeX a la demande
     if (action === "get_tex_content") {
       let fileId = e.parameter.fileId;
 
@@ -153,7 +150,7 @@ function doGet(e) {
       if (!fileId) {
         return ContentService.createTextOutput(JSON.stringify({
           success: false,
-          error: "Parametre fileId ou driveUrl manquant"
+          error: "Parametre fileId manquant"
         })).setMimeType(ContentService.MimeType.JSON);
       }
 
@@ -185,38 +182,68 @@ function doGet(e) {
       }
     }
 
-    // 4. Format JSON pur sur demande
-    if (e.parameter && e.parameter.format === "json") {
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "success",
-        service: "MATEX Apps Script Backend (13 colonnes strictes)",
-        spreadsheetId: SPREADSHEET_ID,
-        driveFolderId: DRIVE_FOLDER_ID,
-        testResult: testResult,
-        timestamp: new Date().toISOString()
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // 5. Console de diagnostic Web
+    // 4. Console Web Interactive avec Statistiques & Top Contributeurs
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const docSheet = ss.getSheetByName("Documents_MATEX");
-    const rowCount = docSheet ? Math.max(0, docSheet.getLastRow() - 1) : 0;
     const memberSheet = ss.getSheetByName("Membres_MATEX");
-    const memberCount = memberSheet ? Math.max(0, memberSheet.getLastRow() - 1) : 0;
+    const donSheet = ss.getSheetByName("Dons_MATEX");
 
+    const totalDocs = docSheet ? Math.max(0, docSheet.getLastRow() - 1) : 0;
+    const totalMembers = memberSheet ? Math.max(0, memberSheet.getLastRow() - 1) : 0;
+    const totalDons = donSheet ? Math.max(0, donSheet.getLastRow() - 1) : 0;
+
+    // Analyse des donnees : Top Contributeurs & Repartition
+    const authorCounts = {};
+    const cycleCounts = { primaire: 0, college: 0, lycee: 0, superieur: 0 };
+    const typeCounts = {};
     let recentRowsHtml = "";
-    if (docSheet && rowCount > 0) {
+
+    if (docSheet && totalDocs > 0) {
       const data = docSheet.getDataRange().getValues();
-      const recent = data.slice(Math.max(1, data.length - 5)).reverse();
+
+      for (let i = 1; i < data.length; i++) {
+        const r = data[i];
+        const cycle = String(r[2] || "").toLowerCase().trim();
+        const type = String(r[5] || "").toLowerCase().trim();
+        const author = String(r[7] || "Enseignant Anonyme").trim();
+
+        if (author) {
+          authorCounts[author] = (authorCounts[author] || 0) + 1;
+        }
+        if (cycleCounts[cycle] !== undefined) {
+          cycleCounts[cycle]++;
+        }
+        if (type) {
+          typeCounts[type] = (typeCounts[type] || 0) + 1;
+        }
+      }
+
+      const recent = data.slice(Math.max(1, data.length - 6)).reverse();
       recentRowsHtml = recent.map(r => `
         <tr style="border-bottom: 1px solid #e2e8f0;">
           <td style="padding: 10px; font-weight: bold; color: #1e293b;">${r[1]}</td>
           <td style="padding: 10px; color: #475569;">${r[3]}</td>
-          <td style="padding: 10px; color: #475569;">${r[7]}</td>
-          <td style="padding: 10px; color: #0284c7;"><a href="${r[11]}" target="_blank" style="color: #0284c7; text-decoration: underline;">Voir Fichier</a></td>
+          <td style="padding: 10px; color: #4338ca; font-weight: 600;">${r[7]}</td>
+          <td style="padding: 10px;"><a href="${r[11]}" target="_blank" style="color: #0284c7; text-decoration: underline; font-weight: bold;">Voir Fichier</a></td>
         </tr>
       `).join("");
     }
+
+    // Classement des top contributeurs
+    const sortedAuthors = Object.keys(authorCounts)
+      .map(name => ({ name: name, count: authorCounts[name] }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    const topAuthorsHtml = sortedAuthors.length > 0 ? sortedAuthors.map((a, idx) => `
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 6px; border: 1px solid #e2e8f0;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-weight: 900; color: #4338ca; font-size: 13px;">#${idx + 1}</span>
+          <span style="font-weight: 700; color: #0f172a; font-size: 13px;">${a.name}</span>
+        </div>
+        <span style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 800;">${a.count} ressource(s)</span>
+      </div>
+    `).join("") : "<p style='font-size: 12px; color: #94a3b8;'>Aucune contribution analysee.</p>";
 
     const html = `
       <!DOCTYPE html>
@@ -224,67 +251,109 @@ function doGet(e) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Console Backend MATEX</title>
+        <title>Tableau de Bord Backend MATEX</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 24px; line-height: 1.5; }
-          .container { max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; overflow: hidden; }
-          .header { background: #1e1b4b; color: #ffffff; padding: 28px; }
-          .title { margin: 0 0 8px 0; font-size: 22px; font-weight: 800; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; color: #0f172a; margin: 0; padding: 24px; line-height: 1.5; }
+          .container { max-width: 900px; margin: 0 auto; background: #ffffff; border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; overflow: hidden; }
+          .header { background: linear-gradient(135deg, #1e1b4b, #312e81); color: #ffffff; padding: 28px; }
+          .title { margin: 0 0 6px 0; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; }
           .subtitle { margin: 0; color: #c7d2fe; font-size: 13px; }
           .body { padding: 24px; }
-          .alert { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px; margin-bottom: 20px; font-size: 13px; color: #1e40af; }
-          .alert-success { background: #f0fdf4; border-color: #bbf7d0; color: #166534; font-weight: 600; }
-          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-          .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
-          .card-title { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-          .card-value { font-size: 18px; font-weight: 800; color: #0f172a; }
+          .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-weight: 600; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; }
+          .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+          .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+          .kpi-label { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+          .kpi-value { font-size: 22px; font-weight: 900; color: #0f172a; }
+          .section-title { font-size: 15px; font-weight: 800; color: #0f172a; margin: 24px 0 12px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
           .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-          .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; }
-          .btn-primary { background: #4f46e5; color: #ffffff; }
+          .btn { display: inline-flex; align-items: center; justify-content: center; padding: 9px 15px; border-radius: 8px; font-size: 12px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; }
+          .btn-primary { background: #4338ca; color: #ffffff; }
           .btn-outline { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; }
           table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
-          th { padding: 8px 10px; background: #f1f5f9; color: #475569; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
+          th { padding: 9px 10px; background: #f8fafc; color: #475569; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
+          .bar-track { background: #e2e8f0; border-radius: 99px; height: 8px; overflow: hidden; margin-top: 4px; }
+          .bar-fill { height: 100%; border-radius: 99px; background: #4338ca; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1 class="title">Console Backend MATEX</h1>
-            <p class="subtitle">Liaison Google Drive, Google Sheets (13 colonnes) & Bibliotheque</p>
+            <h1 class="title">MATEX - Console Pédagogique Backend</h1>
+            <p class="subtitle">Gestionnaire Google Sheets (13 colonnes) & Google Drive National</p>
           </div>
           <div class="body">
-            ${testResult ? `<div class="alert alert-success">${testResult}</div>` : ""}
-            <div class="alert">
-              Onglet des ressources : <strong>Documents_MATEX</strong> (ID : ${SPREADSHEET_ID})
-            </div>
-            <div class="grid">
-              <div class="card">
-                <div class="card-title">Documents references</div>
-                <div class="card-value">${rowCount} document(s)</div>
+            ${testResult ? `<div class="alert-success">${testResult}</div>` : ""}
+
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-label">Documents en Ligne</div>
+                <div class="kpi-value">${totalDocs}</div>
               </div>
-              <div class="card">
-                <div class="card-title">Membres inscrits</div>
-                <div class="card-value">${memberCount} enseignant(s)</div>
+              <div class="kpi-card">
+                <div class="kpi-label">Enseignants Membres</div>
+                <div class="kpi-value">${totalMembers}</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Dons Solidaires</div>
+                <div class="kpi-value">${totalDons}</div>
               </div>
             </div>
+
             <div class="btn-group">
-              <a href="?action=test" class="btn btn-primary">Executer un test de synchronisation</a>
+              <a href="?action=test" class="btn btn-primary">Tester la synchronisation</a>
               <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit" target="_blank" class="btn btn-outline">Ouvrir Google Sheets</a>
               <a href="https://drive.google.com/drive/folders/${DRIVE_FOLDER_ID}" target="_blank" class="btn btn-outline">Ouvrir Google Drive</a>
             </div>
-            ${rowCount > 0 ? `
+
+            <div class="section-title">Palmares des Enseignants Contributeurs</div>
+            ${topAuthorsHtml}
+
+            <div class="section-title">Repartition des Ressources par Cycle</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+              <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold;">
+                  <span>Primaire</span>
+                  <span>${cycleCounts.primaire}</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" style="width: ${totalDocs > 0 ? (cycleCounts.primaire / totalDocs * 100) : 0}%; background: #059669;"></div></div>
+              </div>
+              <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold;">
+                  <span>College (6e - 3e)</span>
+                  <span>${cycleCounts.college}</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" style="width: ${totalDocs > 0 ? (cycleCounts.college / totalDocs * 100) : 0}%; background: #0284c7;"></div></div>
+              </div>
+              <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold;">
+                  <span>Lycee (2nde - Tle)</span>
+                  <span>${cycleCounts.lycee}</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" style="width: ${totalDocs > 0 ? (cycleCounts.lycee / totalDocs * 100) : 0}%; background: #4338ca;"></div></div>
+              </div>
+              <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold;">
+                  <span>Superieur (L1 - M2)</span>
+                  <span>${cycleCounts.superieur}</span>
+                </div>
+                <div class="bar-track"><div class="bar-fill" style="width: ${totalDocs > 0 ? (cycleCounts.superieur / totalDocs * 100) : 0}%; background: #d97706;"></div></div>
+              </div>
+            </div>
+
+            <div class="section-title">Derniers Depots Enregistres</div>
+            ${totalDocs > 0 ? `
               <table>
                 <thead>
                   <tr>
                     <th>Titre</th>
                     <th>Classe</th>
                     <th>Auteur</th>
-                    <th>Lien</th>
+                    <th>Lien Drive</th>
                   </tr>
                 </thead>
                 <tbody>${recentRowsHtml}</tbody>
               </table>
-            ` : "<p style='font-size: 12px; color: #94a3b8;'>Aucun document pour le moment.</p>"}
+            ` : "<p style='font-size: 12px; color: #94a3b8;'>Aucun document reference pour le moment.</p>"}
           </div>
         </div>
       </body>
@@ -305,6 +374,7 @@ function doGet(e) {
 
 /**
  * Gestion des requetes POST (Depot de document, Adhesion membre, Don solidaire)
+ * Structure stricte sur 13 colonnes (A a M)
  */
 function doPost(e) {
   try {
@@ -316,7 +386,9 @@ function doPost(e) {
 
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
-    // 1. DEPOT DE DOCUMENT AVEC TELEVERSEMENT AUTOMATIQUE DANS GOOGLE DRIVE
+    // =========================================================================
+    // 1. DEPOT DE DOCUMENT PÉDAGOGIQUE (COLONNES A A M)
+    // =========================================================================
     if (action === "submit_doc" || data.type === "document") {
       let rootFolder;
       try {
@@ -353,7 +425,7 @@ function doPost(e) {
       let texDriveId = "";
       let texFileName = payload.texFileName || "";
 
-      // 1.1 Televersement du fichier PDF
+      // Enregistrement du fichier PDF dans Google Drive
       const pdfBase64 = payload.pdfBase64 || payload.fileBase64;
       if (pdfBase64 && (!payload.fileMimeType || payload.fileMimeType === "application/pdf" || pdfFileName.toLowerCase().endsWith(".pdf"))) {
         try {
@@ -377,7 +449,7 @@ function doPost(e) {
         }
       }
 
-      // 1.2 Televersement du fichier source TeX dans Google Drive
+      // Enregistrement du fichier source LaTeX (.tex) dans Google Drive
       const texBase64 = payload.texBase64;
       const latexCode = payload.latexCode || payload.latexContent;
       if (texBase64 || latexCode) {
@@ -410,7 +482,6 @@ function doPost(e) {
       const driveUrl = pdfDriveUrl || texDriveUrl || targetFolder.getUrl() || ("https://drive.google.com/drive/folders/" + DRIVE_FOLDER_ID);
       const driveFileId = pdfDriveId || texDriveId || "";
 
-      // Enregistrement STRICTEMENT limite aux 13 colonnes officielles (A a M)
       let sheet = ss.getSheetByName("Documents_MATEX");
       if (!sheet) {
         sheet = ss.insertSheet("Documents_MATEX");
@@ -424,6 +495,7 @@ function doPost(e) {
 
       const timestamp = payload.timestamp || new Date().toLocaleString("fr-FR", { timeZone: "Africa/Abidjan" });
 
+      // Ecriture stricte sur 13 colonnes (A a M)
       sheet.appendRow([
         timestamp,
         payload.title || "",
@@ -440,7 +512,6 @@ function doPost(e) {
         driveFileId || ""
       ]);
 
-      // Invalidation immediate du cache memoire
       try {
         CacheService.getScriptCache().remove(CACHE_CATALOG_KEY);
       } catch (cPurgeErr) {}
@@ -457,7 +528,9 @@ function doPost(e) {
         subFolder: subFolderName
       })).setMimeType(ContentService.MimeType.JSON);
 
-    // 2. ADHESION D'UN NOUVEAU MEMBRE
+    // =========================================================================
+    // 2. ADHESION D'UN NOUVEAU MEMBRE ENSEIGNANT
+    // =========================================================================
     } else if (action === "join_member" || data.type === "member") {
       let sheet = ss.getSheetByName("Membres_MATEX");
       if (!sheet) {
@@ -488,7 +561,9 @@ function doPost(e) {
         message: "Membre enregistre avec succes"
       })).setMimeType(ContentService.MimeType.JSON);
 
+    // =========================================================================
     // 3. ENREGISTREMENT D'UN DON SOLIDAIRE
+    // =========================================================================
     } else if (action === "donate" || data.type === "donation") {
       let proofDriveUrl = "";
 
