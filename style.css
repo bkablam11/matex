@@ -1,6 +1,6 @@
 /**
  * ==========================================================================
- * MATEX - Feuilles de styles personnalisées
+ * MATEX - Feuilles de styles personnalisées & Responsive Mobile/Tablette
  * Bibliothèque Pédagogique & Communauté Nationale • CP1 au Master 2
  * ==========================================================================
  */
@@ -12,6 +12,12 @@
   --primary-hover: #3730a3;
   --secondary: #059669;
   --accent: #d97706;
+}
+
+/* Empeche le glissement horizontal indesirable sur mobile */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -28,10 +34,10 @@ body {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Custom Scrollbars */
+/* Custom Scrollbars fluides et discretes */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -47,35 +53,43 @@ body {
   background: #94a3b8;
 }
 
-/* KaTeX custom sizing & overflow */
+/* KaTeX responsive : defilement horizontal fluide si formule trop large */
 .katex-display {
   margin: 0.5em 0 !important;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0.25rem 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .katex {
-  font-size: 1.05em;
+  font-size: 1em;
   text-rendering: auto;
 }
 
-/* Authentic A4 Paper preview */
+/* Simulation feuille A4 responsive (Mobile, Tablette, PC) */
 .a4-paper-sheet {
   width: 100%;
-  max-width: 794px; /* standard 96dpi A4 width */
-  min-height: 1123px; /* standard 96dpi A4 height */
+  max-width: 794px;
+  min-height: auto;
   background: #ffffff;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
   margin: 0 auto;
-  padding: 2.5rem 3rem;
+  padding: 1.25rem;
   border: 1px solid #e2e8f0;
   position: relative;
   transition: transform 0.2s ease-in-out;
-  transform-origin: top center;
+  box-sizing: border-box;
 }
 
-/* Badge and cycle colors */
+@media (min-width: 640px) {
+  .a4-paper-sheet {
+    padding: 2rem 2.5rem;
+    min-height: 1123px;
+  }
+}
+
+/* Badges de cycles */
 .cycle-badge-primaire {
   background-color: #ecfdf5;
   color: #047857;
@@ -100,7 +114,7 @@ body {
   border-color: #fde68a;
 }
 
-/* Animations */
+/* Animations de transition */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -109,7 +123,7 @@ body {
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(10px);
+    transform: scale(0.97) translateY(8px);
   }
   to {
     opacity: 1;
@@ -125,11 +139,11 @@ body {
   animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Active tab styles */
+/* Onglets */
 .tab-btn-active {
   background-color: #ffffff;
   color: #0f172a;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .tab-btn-inactive {
@@ -140,46 +154,7 @@ body {
   color: #0f172a;
 }
 
-/* Print Optimization */
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  
-  #modalDocumentViewer,
-  #modalDocumentViewer * {
-    visibility: visible;
-  }
-  
-  #modalDocumentViewer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    background: transparent !important;
-  }
-
-  .no-print,
-  .modal-close-btn,
-  .viewer-controls-bar,
-  .viewer-bottom-banner {
-    display: none !important;
-  }
-
-  .a4-paper-sheet {
-    box-shadow: none !important;
-    border: none !important;
-    padding: 1.5cm 2cm !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: auto !important;
-    transform: none !important;
-  }
-}
-
-/* Animations et Défilement Continu pour le Carrousel Photos (De la gauche vers la droite) */
+/* Carrousel Defilant Continu */
 @keyframes marqueeScrollLeftToRight {
   0% {
     transform: translateX(-50%);
@@ -200,22 +175,40 @@ body {
   animation-play-state: paused;
 }
 
-/* Styles d'impression pour les Fiches de Progression DPFC 2026-2027 */
+/* Optimisation Impression */
 @media print {
   body * {
     visibility: hidden;
   }
-  #modalCurriculum, #modalCurriculum * {
+  
+  #modalDocumentViewer,
+  #modalDocumentViewer *,
+  #modalCurriculum,
+  #modalCurriculum * {
     visibility: visible;
   }
-  #modalCurriculum {
+  
+  #modalDocumentViewer, #modalCurriculum {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
-    height: auto;
-    background: white !important;
-    padding: 0 !important;
+    margin: 0;
+    padding: 0;
+    background: transparent !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .a4-paper-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 1.5cm !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    transform: none !important;
   }
 }
-

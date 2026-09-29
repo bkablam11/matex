@@ -2,7 +2,7 @@
 <html lang="fr" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MATEX - Bibliotheque Pedagogique & Communaute Nationale - CP1 au Master 2</title>
   <meta name="description" content="Plateforme nationale de partage de ressources mathematiques en LaTeX et PDF de l ecole primaire au superieur et a l agregation en Cote d Ivoire.">
   
@@ -45,49 +45,53 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500 selection:text-white antialiased flex flex-col justify-between">
+<body class="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-500 selection:text-white antialiased flex flex-col justify-between overflow-x-hidden">
 
   <!-- ========================================================================= -->
-  <!-- BARRE DE NAVIGATION PRINCIPALE (Header)                                   -->
+  <!-- BARRE DE NAVIGATION PRINCIPALE (Header Responsive Mobile & PC)            -->
   <!-- ========================================================================= -->
   <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2.5 px-3 py-2.5 sm:px-6 lg:px-8">
       
-      <a href="#librarySection" class="flex items-center gap-3 group">
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-950 text-white font-serif text-2xl font-black shadow-md shadow-indigo-950/20 group-hover:scale-105 transition">
+      <!-- Logo MATEX -->
+      <a href="#librarySection" class="flex items-center gap-2 group shrink-0">
+        <div class="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-950 text-white font-serif text-xl sm:text-2xl font-black shadow-md shadow-indigo-950/20 group-hover:scale-105 transition">
           M
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <span class="font-serif text-xl font-black tracking-tight text-slate-900">MATEX</span>
-            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-extrabold text-emerald-800 border border-emerald-200">
+          <div class="flex items-center gap-1.5">
+            <span class="font-serif text-lg sm:text-xl font-black tracking-tight text-slate-900">MATEX</span>
+            <span class="rounded-full bg-emerald-100 px-2 py-0.2 text-[9px] sm:text-[10px] font-extrabold text-emerald-800 border border-emerald-200">
               CIV
             </span>
           </div>
-          <p class="text-[11px] font-semibold text-slate-500 hidden sm:block">
+          <p class="text-[10px] sm:text-[11px] font-semibold text-slate-500 hidden md:block">
             Bibliotheque Pedagogique & Communaute Nationale - CP1 au Master 2
           </p>
         </div>
       </a>
 
-      <div class="flex items-center gap-1 rounded-2xl bg-slate-100 p-1 text-xs font-bold border border-slate-200">
+      <!-- Onglets Centraux (Sur mobile : pleine largeur en 2e ligne pour un clic aisé) -->
+      <div class="flex items-center gap-1 rounded-2xl bg-slate-100 p-1 text-[11px] sm:text-xs font-bold border border-slate-200 order-3 md:order-2 w-full md:w-auto justify-center">
         <button
           type="button"
           id="navBtnLibrary"
-          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition bg-white text-slate-900 shadow-xs"
+          onclick="switchNavTab('library')"
+          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition bg-white text-slate-900 shadow-xs cursor-pointer flex-1 md:flex-initial justify-center"
         >
-          <i data-lucide="book-open" class="h-4 w-4 text-indigo-600"></i>
-          <span>Bibliotheque</span>
+          <i data-lucide="book-open" class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-indigo-600 pointer-events-none"></i>
+          <span class="pointer-events-none">Bibliotheque</span>
         </button>
 
         <button
           type="button"
           id="navBtnAiStudio"
-          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition text-slate-600 hover:text-slate-900"
+          onclick="switchNavTab('aiStudio')"
+          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition text-slate-600 hover:text-slate-900 cursor-pointer flex-1 md:flex-initial justify-center"
         >
-          <i data-lucide="sparkles" class="h-4 w-4 text-purple-600"></i>
-          <span>Photo en Sujet</span>
-          <span class="rounded-full bg-purple-100 text-purple-800 text-[9px] font-black px-1.5 py-0.2 border border-purple-200">
+          <i data-lucide="sparkles" class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-600 pointer-events-none"></i>
+          <span class="pointer-events-none">Photo en Sujet</span>
+          <span class="pointer-events-none rounded-full bg-purple-100 text-purple-800 text-[9px] font-black px-1.5 py-0.2 border border-purple-200">
             IA
           </span>
         </button>
@@ -95,32 +99,34 @@
         <button
           type="button"
           id="navBtnTraining"
-          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition text-slate-600 hover:text-slate-900"
+          onclick="switchNavTab('training')"
+          class="flex items-center gap-1.5 rounded-xl px-3 py-1.5 transition text-slate-600 hover:text-slate-900 cursor-pointer flex-1 md:flex-initial justify-center"
         >
-          <i data-lucide="graduation-cap" class="h-4 w-4 text-amber-600"></i>
-          <span>Formation LaTeX</span>
-          <span class="rounded-full bg-amber-500 text-slate-950 text-[9px] font-black px-1.5 py-0.2 shadow-2xs">
+          <i data-lucide="graduation-cap" class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600 pointer-events-none"></i>
+          <span class="pointer-events-none">Formation</span>
+          <span class="pointer-events-none rounded-full bg-amber-500 text-slate-950 text-[9px] font-black px-1.5 py-0.2 shadow-2xs hidden sm:inline">
             2e Cohorte
           </span>
         </button>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-2.5">
+      <!-- Boutons d'Action (Déposer, Rejoindre, Don) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 order-2 md:order-3">
         <button
           type="button"
           id="navBtnSubmit"
-          class="hidden md:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-2xs transition hover:border-slate-300 hover:bg-slate-50"
+          class="hidden lg:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs transition hover:bg-slate-50"
         >
-          <i data-lucide="plus-circle" class="h-4 w-4 text-indigo-600"></i>
-          <span>Deposer un document</span>
+          <i data-lucide="plus-circle" class="h-3.5 w-3.5 text-indigo-600"></i>
+          <span>Deposer</span>
         </button>
 
         <button
           type="button"
           id="navBtnJoin"
-          class="flex items-center gap-1.5 rounded-xl border border-emerald-600 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-800 transition hover:bg-emerald-600 hover:text-white"
+          class="flex items-center gap-1 rounded-xl border border-emerald-600 bg-emerald-50 px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-bold text-emerald-800 transition hover:bg-emerald-600 hover:text-white"
         >
-          <i data-lucide="users" class="h-4 w-4"></i>
+          <i data-lucide="users" class="h-3.5 w-3.5"></i>
           <span class="hidden sm:inline">Rejoindre MATEX</span>
           <span class="sm:hidden">Rejoindre</span>
         </button>
@@ -128,12 +134,14 @@
         <button
           type="button"
           onclick="openDonateModal()"
-          class="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-sm transition hover:from-amber-400 hover:to-amber-500"
+          class="flex items-center gap-1 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-bold text-slate-950 shadow-sm transition hover:from-amber-400 hover:to-amber-500"
         >
-          <i data-lucide="heart" class="h-4 w-4 fill-slate-950 text-slate-950"></i>
+          <i data-lucide="heart" class="h-3.5 w-3.5 fill-slate-950 text-slate-950"></i>
           <span>Faire un Don</span>
         </button>
       </div>
+
+    </div>
   </header>
 
   <!-- ========================================================================= -->
@@ -141,34 +149,34 @@
   <!-- ========================================================================= -->
   <main id="viewLibrary" class="flex-1">
 
-    <section class="relative border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white overflow-hidden py-12 sm:py-16">
+    <section class="relative border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white overflow-hidden py-10 sm:py-16">
       <div class="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
 
       <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
         
-        <div class="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-900/40 px-4 py-1.5 text-xs font-bold text-indigo-200 backdrop-blur-md mb-6">
+        <div class="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-900/40 px-3.5 py-1 text-[11px] sm:text-xs font-bold text-indigo-200 backdrop-blur-md mb-4 sm:mb-6">
           <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
           <span>Ressources Pedagogiques Officielles MENAET & Enseignement Superieur</span>
         </div>
 
-        <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
+        <h1 class="font-serif text-2xl sm:text-4xl lg:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
           De la Maternelle au Doctorat : <br class="hidden sm:inline">
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-indigo-200">
             La Bibliotheque Pedagogique d Excellence
           </span>
         </h1>
 
-        <p class="mt-4 max-w-2xl mx-auto text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
+        <p class="mt-3 sm:mt-4 max-w-2xl mx-auto text-xs sm:text-sm md:text-base text-slate-300 font-normal leading-relaxed">
           Accedez aux documents conformes au referentiel officiel du Ministere de l Education Nationale (MENAET) et de l Enseignement Superieur. 
           Consultez les fichiers PDF et telechargez les codes sources LaTeX (<code class="text-emerald-400 font-mono">.tex</code>).
         </p>
 
-        <div class="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+        <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             id="btnHeroExplore"
-            class="flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-white/10 transition hover:bg-slate-100"
+            class="flex items-center gap-2 rounded-2xl bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-white/10 transition hover:bg-slate-100"
           >
             <i data-lucide="compass" class="h-4 w-4 text-indigo-700"></i>
             <span>Explorer les Documents</span>
@@ -177,44 +185,45 @@
           <button
             type="button"
             id="btnHeroTraining"
-            class="flex items-center gap-2 rounded-2xl border border-amber-400/40 bg-amber-400/10 px-6 py-3 text-xs sm:text-sm font-bold text-amber-300 backdrop-blur-md transition hover:bg-amber-400/20"
+            class="flex items-center gap-2 rounded-2xl border border-amber-400/40 bg-amber-400/10 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-amber-300 backdrop-blur-md transition hover:bg-amber-400/20"
           >
             <i data-lucide="graduation-cap" class="h-4 w-4"></i>
             <span>Formation Gratuite (2e Cohorte)</span>
           </button>
         </div>
 
-        <div class="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl mx-auto text-left">
-          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-emerald-400/40 group" data-cycle="primaire">
-            <div class="font-serif text-sm font-bold text-white group-hover:text-emerald-300 transition">Primaire</div>
-            <div class="text-[11px] text-slate-400">CP1, CP2, CE1, CE2, CM1, CM2</div>
+        <div class="mt-8 sm:mt-12 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 max-w-5xl mx-auto text-left">
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-emerald-400/40 group" data-cycle="primaire">
+            <div class="font-serif text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition">Primaire</div>
+            <div class="text-[10px] sm:text-[11px] text-slate-400 truncate">CP1 au CM2</div>
           </button>
 
-          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-sky-400/40 group" data-cycle="college">
-            <div class="font-serif text-sm font-bold text-white group-hover:text-sky-300 transition">1er Cycle (College)</div>
-            <div class="text-[11px] text-slate-400">6e, 5e, 4e, 3e (BEPC)</div>
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-sky-400/40 group" data-cycle="college">
+            <div class="font-serif text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition">1er Cycle (College)</div>
+            <div class="text-[10px] sm:text-[11px] text-slate-400 truncate">6e, 5e, 4e, 3e (BEPC)</div>
           </button>
 
-          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-indigo-400/40 group" data-cycle="lycee">
-            <div class="font-serif text-sm font-bold text-white group-hover:text-indigo-300 transition">2nd Cycle (Lycee)</div>
-            <div class="text-[11px] text-slate-400">2de A/C, 1re A/C/D, Tle A/C/D</div>
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-indigo-400/40 group" data-cycle="lycee">
+            <div class="font-serif text-xs sm:text-sm font-bold text-white group-hover:text-indigo-300 transition">2nd Cycle (Lycee)</div>
+            <div class="text-[10px] sm:text-[11px] text-slate-400 truncate">2de, 1re, Tle (A/C/D)</div>
           </button>
 
-          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-amber-400/40 group" data-cycle="superieur">
-            <div class="font-serif text-sm font-bold text-white group-hover:text-amber-300 transition">Superieur & Recherche</div>
-            <div class="text-[11px] text-slate-400">L1/MPSI, L2/MP, L3/M1, M2/Agregation</div>
+          <button type="button" class="hero-parcours-btn rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 backdrop-blur-sm transition hover:bg-white/10 hover:border-amber-400/40 group" data-cycle="superieur">
+            <div class="font-serif text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 transition">Superieur & Recherche</div>
+            <div class="text-[10px] sm:text-[11px] text-slate-400 truncate">L1/MPSI a M2/Agregation</div>
           </button>
         </div>
 
       </div>
     </section>
 
-    <section id="librarySection" class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <section id="librarySection" class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
       
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
+      <!-- Barre des Parcours avec defilement horizontal fluide -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 whitespace-nowrap no-scrollbar">
         <button
           type="button"
-          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 shadow-sm bg-slate-900 text-white"
+          class="cycle-filter-btn shrink-0 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 shadow-sm bg-slate-900 text-white"
           data-cycle="all"
         >
           <span>Tous les Parcours</span>
@@ -223,7 +232,7 @@
 
         <button
           type="button"
-          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          class="cycle-filter-btn shrink-0 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
           data-cycle="primaire"
         >
           <span>Primaire (CP1 - CM2)</span>
@@ -232,7 +241,7 @@
 
         <button
           type="button"
-          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          class="cycle-filter-btn shrink-0 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
           data-cycle="college"
         >
           <span>1er Cycle / College (6e - 3e)</span>
@@ -241,7 +250,7 @@
 
         <button
           type="button"
-          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          class="cycle-filter-btn shrink-0 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
           data-cycle="lycee"
         >
           <span>2nd Cycle / Lycee (2nde - Tle)</span>
@@ -250,7 +259,7 @@
 
         <button
           type="button"
-          class="cycle-filter-btn rounded-xl px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          class="cycle-filter-btn shrink-0 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-bold transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
           data-cycle="superieur"
         >
           <span>Superieur & Recherche (L1 - M2)</span>
@@ -258,26 +267,27 @@
         </button>
       </div>
 
-      <div class="mt-4 flex flex-col md:flex-row items-center justify-between gap-4 rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-indigo-50/90 via-white to-amber-50/50 p-4 sm:p-5 shadow-xs">
+      <!-- Banniere Progression Officielle -->
+      <div class="mt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-indigo-50/90 via-white to-amber-50/50 p-4 sm:p-5 shadow-xs">
         <div class="flex items-center gap-3.5">
-          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
-            <i data-lucide="calendar-check-2" class="h-6 w-6"></i>
+          <div class="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
+            <i data-lucide="calendar-check-2" class="h-5 w-5 sm:h-6 sm:w-6"></i>
           </div>
           <div>
             <div class="flex flex-wrap items-center gap-2">
-              <span class="font-serif text-sm sm:text-base font-bold text-slate-900">
+              <span class="font-serif text-xs sm:text-base font-bold text-slate-900 leading-snug">
                 Progressions Annuelles Officielles de Mathematiques - 2026-2027
               </span>
-              <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-800 border border-emerald-200">
+              <span class="rounded-full bg-emerald-100 px-2 py-0.2 text-[9px] sm:text-[10px] font-extrabold text-emerald-800 border border-emerald-200">
                 DPFC / MENAET
               </span>
             </div>
-            <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">
+            <p class="text-[11px] sm:text-xs text-slate-600 mt-0.5 leading-relaxed">
               Consultez le decoupage officiel par trimestre, volumes horaires hebdomadaires et lecons homologuees.
             </p>
           </div>
         </div>
-        <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
+        <div class="w-full md:w-auto shrink-0">
           <button
             type="button"
             onclick="openCurriculumModal()"
@@ -289,7 +299,8 @@
         </div>
       </div>
 
-      <div class="mt-6 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs space-y-4">
+      <!-- Bloc Recherche et Filtres -->
+      <div class="mt-5 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs space-y-4">
         <div class="relative">
           <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
             <i data-lucide="search" class="h-4 w-4"></i>
@@ -297,8 +308,8 @@
           <input
             type="text"
             id="searchInput"
-            placeholder="Rechercher par titre, classe, lecon officielle, auteur, formule ou etablissement..."
-            class="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-3 pl-10 pr-10 text-xs sm:text-sm font-medium text-slate-900 placeholder-slate-400 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600/20"
+            placeholder="Rechercher par titre, classe, lecon, auteur, formule..."
+            class="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-2.5 sm:py-3 pl-10 pr-10 text-xs sm:text-sm font-medium text-slate-900 placeholder-slate-400 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600/20"
           >
           <button
             type="button"
@@ -378,8 +389,9 @@
         <div id="activeFiltersBar" class="hidden pt-2 border-t border-slate-100"></div>
       </div>
 
-      <div class="mt-8 flex items-center justify-between">
-        <h2 id="docCountBadge" class="font-serif text-lg font-bold text-slate-900">
+      <!-- En-tete de liste des documents -->
+      <div class="mt-6 sm:mt-8 flex items-center justify-between">
+        <h2 id="docCountBadge" class="font-serif text-base sm:text-lg font-bold text-slate-900">
           Documents Repertories (0)
         </h2>
         
@@ -393,14 +405,16 @@
         </button>
       </div>
 
-      <div id="documentsGrid" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      <!-- Grille responsive des documents -->
+      <div id="documentsGrid" class="mt-4 sm:mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
 
-      <div id="emptyState" class="hidden text-center py-16 rounded-3xl border border-dashed border-slate-300 bg-white mt-6">
-        <div class="h-16 w-16 mx-auto flex items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3">
-          <i data-lucide="file-question" class="h-8 w-8"></i>
+      <!-- Etat vide si aucun filtre ne correspond -->
+      <div id="emptyState" class="hidden text-center py-12 sm:py-16 rounded-3xl border border-dashed border-slate-300 bg-white mt-6">
+        <div class="h-14 w-14 sm:h-16 sm:w-16 mx-auto flex items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-3">
+          <i data-lucide="file-question" class="h-7 w-7 sm:h-8 sm:w-8"></i>
         </div>
-        <h3 class="font-serif text-lg font-bold text-slate-800">Aucun document ne correspond a vos filtres</h3>
-        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+        <h3 class="font-serif text-base sm:text-lg font-bold text-slate-800">Aucun document ne correspond a vos filtres</h3>
+        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto px-4">
           Elargissez votre recherche ou reinitialisez vos criteres de selection.
         </p>
         <button
@@ -416,168 +430,13 @@
   </main>
 
   <!-- ========================================================================= -->
-  <!-- VUE 2 : LA FORMATION LATEX (2E COHORTE)                                   -->
-  <!-- ========================================================================= -->
-  <section id="viewTraining" class="hidden flex-1 pb-16">
-    
-    <div class="border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white py-12 sm:py-16">
-      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
-        
-        <div class="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-xs font-bold text-amber-300 backdrop-blur-md mb-6">
-          <i data-lucide="award" class="h-4 w-4"></i>
-          <span>Session de Formation Pratique Intensive aux Logiciels LaTeX & TikZ</span>
-        </div>
-
-        <h1 class="font-serif text-3xl sm:text-5xl font-black tracking-tight text-white max-w-3xl mx-auto leading-tight">
-          Apprenez a Rediger des Documents Mathematiques d Excellence
-        </h1>
-
-        <p class="mt-4 max-w-2xl mx-auto text-sm sm:text-base text-slate-300 font-normal leading-relaxed">
-          18 heures de formation pratique pour les professeurs et etudiants. Maitrisez la syntaxe LaTeX, les formules, TikZ et la mise en page d examens.
-        </p>
-
-        <div class="mt-8 inline-flex items-center gap-4 rounded-2xl border border-white/15 bg-white/5 px-6 py-3.5 text-left backdrop-blur-md">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500 font-serif text-xl font-bold text-slate-950">
-            ST
-          </div>
-          <div>
-            <div class="text-xs font-bold text-amber-300 uppercase tracking-wider">Sous l egide scientifique de</div>
-            <div class="font-serif text-sm font-bold text-white">Pr. Saliou TOURE</div>
-            <div class="text-[11px] text-slate-400">President de la Societe Mathematique de Cote d Ivoire (SMCI)</div>
-          </div>
-        </div>
-
-        <div class="mt-8 flex flex-wrap items-center justify-center gap-3.5">
-          <a
-            href="https://forms.gle/2sPqT34ESzQR1S5L7"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 rounded-2xl bg-amber-500 px-6 py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 transition hover:bg-amber-400"
-          >
-            <i data-lucide="file-check" class="h-4 w-4"></i>
-            <span>S inscrire Gratuitement a la 2e Cohorte</span>
-          </a>
-
-          <a
-            href="https://chat.whatsapp.com/D3Z48FSKgQT57ZA9lqLdJh?mode=gi_t"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 rounded-2xl border border-emerald-500 bg-emerald-600/20 px-6 py-3 text-xs sm:text-sm font-bold text-emerald-300 backdrop-blur-md transition hover:bg-emerald-600 hover:text-white"
-          >
-            <i data-lucide="message-circle" class="h-4 w-4"></i>
-            <span>Groupe WhatsApp Officiel Formation</span>
-          </a>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 space-y-10">
-      
-      <div class="text-center">
-        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
-          Syllabus Pedagogique des 18 Heures
-        </h2>
-        <p class="text-xs sm:text-sm text-slate-600 mt-1">
-          Une methode progressive concue pour passer de debutant a expert autonome.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
-          <div class="flex items-center justify-between mb-3">
-            <span class="rounded-lg bg-indigo-50 text-indigo-700 px-2.5 py-1 text-xs font-bold border border-indigo-200">Module 1 - 3h</span>
-            <i data-lucide="terminal" class="h-5 w-5 text-indigo-600"></i>
-          </div>
-          <h3 class="font-serif text-base font-bold text-slate-900">Environnement & Syntaxe Fondamentale</h3>
-          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
-            <li>- Installation de TeX Live, MiKTeX, TeXstudio et Overleaf</li>
-            <li>- Structure d un preambule officiel (articles, examens)</li>
-            <li>- Gestion des accents, des polices et des marges A4</li>
-          </ul>
-        </div>
-
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
-          <div class="flex items-center justify-between mb-3">
-            <span class="rounded-lg bg-emerald-50 text-emerald-700 px-2.5 py-1 text-xs font-bold border border-emerald-200">Module 2 - 4h</span>
-            <i data-lucide="binary" class="h-5 w-5 text-emerald-600"></i>
-          </div>
-          <h3 class="font-serif text-base font-bold text-slate-900">Formules Mathematiques, Matrices & Systemes</h3>
-          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
-            <li>- Environnements amsmath, align et matrices</li>
-            <li>- Fractions, radicaux, integrales, sommes et limites</li>
-            <li>- Systemes d equations avec accolades</li>
-          </ul>
-        </div>
-
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
-          <div class="flex items-center justify-between mb-3">
-            <span class="rounded-lg bg-amber-50 text-amber-800 px-2.5 py-1 text-xs font-bold border border-amber-200">Module 3 - 5h</span>
-            <i data-lucide="pen-tool" class="h-5 w-5 text-amber-600"></i>
-          </div>
-          <h3 class="font-serif text-base font-bold text-slate-900">Figures Vectorielles avec TikZ & PGFPlots</h3>
-          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
-            <li>- Trace de configurations geometriques planes</li>
-            <li>- Courbes de fonctions et asymptotes</li>
-            <li>- Tableaux de variations avec tkz-tab</li>
-          </ul>
-        </div>
-
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
-          <div class="flex items-center justify-between mb-3">
-            <span class="rounded-lg bg-blue-50 text-blue-700 px-2.5 py-1 text-xs font-bold border border-blue-200">Module 4 - 3h</span>
-            <i data-lucide="presentation" class="h-5 w-5 text-blue-600"></i>
-          </div>
-          <h3 class="font-serif text-base font-bold text-slate-900">Presentations Beamer & Diaporamas</h3>
-          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
-            <li>- Diaporamas scientifiques avec la classe Beamer</li>
-            <li>- Blocs theoremes et animations pas a pas</li>
-            <li>- Projection en classe et soutenances</li>
-          </ul>
-        </div>
-
-        <div class="col-span-1 md:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-xs">
-          <div class="flex items-center justify-between mb-3">
-            <span class="rounded-lg bg-purple-50 text-purple-700 px-2.5 py-1 text-xs font-bold border border-purple-200">Module 5 - 3h</span>
-            <i data-lucide="sparkles" class="h-5 w-5 text-purple-600"></i>
-          </div>
-          <h3 class="font-serif text-base font-bold text-slate-900">Production d Examens Types & Automatisation</h3>
-          <p class="text-xs text-slate-600 mt-2">
-            Creation d epreuves types avec bareme en marge, gestion des corriges et export.
-          </p>
-        </div>
-      </div>
-
-      <div class="rounded-3xl border border-slate-200 bg-indigo-50/50 p-6 sm:p-8 text-center">
-        <h3 class="font-serif text-lg font-bold text-indigo-950">
-          Ateliers Deployes dans 6 Poles Universitaires & Regionaux
-        </h3>
-        <p class="text-xs text-indigo-800 mt-1 max-w-xl mx-auto">
-          Sessions dispensees en presentiel et retransmises en direct.
-        </p>
-
-        <div class="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs font-bold">
-          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">Abidjan (UFHB Cocody & ENS)</span>
-          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">Yamoussoukro (INP-HB)</span>
-          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">Bouake (Alassane Ouattara)</span>
-          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">Korhogo (Peleforo Gon Coulibaly)</span>
-          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">Daloa (Jean Lorougnon Guede)</span>
-          <span class="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-indigo-900 shadow-2xs">San-Pedro (Universite de San-Pedro)</span>
-        </div>
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- VUE : STUDIO IA - NUMERISATION OVERLEAF-LIKE (PHOTO VERS PDF)             -->
+  <!-- VUE 2 : STUDIO IA - NUMERISATION OVERLEAF-LIKE (PHOTO VERS PDF)             -->
   <!-- ========================================================================= -->
   <section id="viewAiStudio" class="hidden flex-1 pb-16">
-    <div class="border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white py-10 sm:py-14">
+    <div class="border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white py-8 sm:py-14">
       <div class="mx-auto max-w-5xl px-4 sm:px-6 text-center">
         
-        <div class="inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-4 py-1 text-xs font-bold text-purple-200 backdrop-blur-md mb-4">
+        <div class="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-500/10 px-3.5 py-1 text-xs font-bold text-purple-200 backdrop-blur-md mb-3 sm:mb-4">
           <i data-lucide="sparkles" class="h-4 w-4 text-purple-400"></i>
           <span>Assistant de Numerisation Pedagogique Automatique</span>
         </div>
@@ -586,51 +445,51 @@
           Photographiez un Sujet, Obtenez le PDF Imprimable
         </h1>
 
-        <p class="mt-3 max-w-2xl mx-auto text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
+        <p class="mt-2.5 sm:mt-3 max-w-2xl mx-auto text-xs sm:text-sm text-slate-300 font-normal leading-relaxed px-2">
           Prenez une photo nette de votre evaluation ou chargez une image. L intelligence artificielle retranscrit vos exercices et compile directement le document en PDF selon les gabarits homologues MATEX.
         </p>
 
         <!-- Statut Cle API -->
-        <div class="mt-5 inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3.5 py-1.5 text-xs text-slate-300">
+        <div class="mt-4 sm:mt-5 inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3 py-1.5 text-[11px] sm:text-xs text-slate-300">
           <span class="flex h-2 w-2 rounded-full bg-emerald-400"></span>
-          <span>Cle Gemini preconfiguree & active</span>
-          <button type="button" onclick="toggleApiKeyModal()" class="text-purple-300 hover:text-white underline font-semibold text-[11px] ml-1">
+          <span>Cle Gemini active (Mode communaute)</span>
+          <button type="button" onclick="toggleApiKeyModal()" class="text-purple-300 hover:text-white underline font-semibold text-[10px] sm:text-[11px] ml-1">
             Changer la cle
           </button>
         </div>
 
-        <div id="apiKeyEditPanel" class="hidden mt-3 max-w-md mx-auto flex items-center gap-2">
+        <div id="apiKeyEditPanel" class="hidden mt-3 max-w-md mx-auto flex items-center gap-2 px-3">
           <input
             type="password"
             id="inputUserApiKey"
-            placeholder="Coller une autre cle API Gemini..."
+            placeholder="Coller une cle personnelle API Gemini..."
             class="flex-1 rounded-xl border border-white/20 bg-slate-900 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-purple-400"
           >
           <button
             type="button"
             onclick="saveUserApiKey()"
-            class="rounded-xl bg-purple-600 hover:bg-purple-500 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm"
+            class="rounded-xl bg-purple-600 hover:bg-purple-500 px-3 py-1.5 text-xs font-bold text-white transition shadow-sm shrink-0"
           >
-            Enregistrer
+            Valider
           </button>
         </div>
 
       </div>
     </div>
 
-    <!-- Espace Studio en 2 Colonnes (comme sur Overleaf) -->
-    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Espace Studio Responsive en 2 Colonnes -->
+    <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
 
         <!-- PANNEAU GAUCHE : Selection & Prise de Photo -->
-        <div class="lg:col-span-5 space-y-5">
-          <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs space-y-5">
+        <div class="lg:col-span-5 space-y-4 sm:space-y-5">
+          <div class="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-5">
             
             <!-- Etape 1 : Choix du type de document -->
             <div>
-              <div class="flex items-center gap-2 mb-2.5">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-xs">1</span>
-                <h3 class="font-serif text-sm font-bold text-slate-900">Type de document a generer :</h3>
+              <div class="flex items-center gap-2 mb-2 sm:mb-2.5">
+                <span class="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-[11px] sm:text-xs">1</span>
+                <h3 class="font-serif text-xs sm:text-sm font-bold text-slate-900">Type de document a generer :</h3>
               </div>
 
               <div class="grid grid-cols-3 gap-2">
@@ -638,7 +497,7 @@
                   type="button"
                   id="btnSelectInterro"
                   onclick="setAiDocumentType('interro')"
-                  class="rounded-2xl border-2 border-indigo-600 bg-indigo-50/80 p-3 text-center transition flex flex-col items-center justify-between"
+                  class="rounded-2xl border-2 border-indigo-600 bg-indigo-50/80 p-2.5 sm:p-3 text-center transition flex flex-col items-center justify-between"
                 >
                   <i data-lucide="scissors" class="h-4 w-4 text-indigo-700 mb-1"></i>
                   <span class="text-xs font-bold text-indigo-950">Interro</span>
@@ -649,7 +508,7 @@
                   type="button"
                   id="btnSelectDevoir"
                   onclick="setAiDocumentType('devoir')"
-                  class="rounded-2xl border border-slate-200 bg-white p-3 text-center transition hover:bg-slate-50 flex flex-col items-center justify-between"
+                  class="rounded-2xl border border-slate-200 bg-white p-2.5 sm:p-3 text-center transition hover:bg-slate-50 flex flex-col items-center justify-between"
                 >
                   <i data-lucide="file-text" class="h-4 w-4 text-slate-600 mb-1"></i>
                   <span class="text-xs font-bold text-slate-800">Devoir</span>
@@ -660,7 +519,7 @@
                   type="button"
                   id="btnSelectCorrige"
                   onclick="setAiDocumentType('corrige')"
-                  class="rounded-2xl border border-slate-200 bg-white p-3 text-center transition hover:bg-slate-50 flex flex-col items-center justify-between"
+                  class="rounded-2xl border border-slate-200 bg-white p-2.5 sm:p-3 text-center transition hover:bg-slate-50 flex flex-col items-center justify-between"
                 >
                   <i data-lucide="check-check" class="h-4 w-4 text-slate-600 mb-1"></i>
                   <span class="text-xs font-bold text-slate-800">Corrige</span>
@@ -671,29 +530,29 @@
 
             <!-- Etape 2 : Photo ou Fichier Image -->
             <div>
-              <div class="flex items-center gap-2 mb-2.5">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-xs">2</span>
-                <h3 class="font-serif text-sm font-bold text-slate-900">Photo de votre sujet :</h3>
+              <div class="flex items-center gap-2 mb-2 sm:mb-2.5">
+                <span class="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-[11px] sm:text-xs">2</span>
+                <h3 class="font-serif text-xs sm:text-sm font-bold text-slate-900">Photo de votre sujet :</h3>
               </div>
 
               <div
                 id="aiDropZonePhoto"
-                class="cursor-pointer rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center hover:border-indigo-600 hover:bg-indigo-50/20 transition"
+                class="cursor-pointer rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 sm:p-6 text-center hover:border-indigo-600 hover:bg-indigo-50/20 transition"
               >
-                <i data-lucide="camera" class="h-8 w-8 mx-auto text-indigo-600 mb-2"></i>
+                <i data-lucide="camera" class="h-7 w-7 sm:h-8 sm:w-8 mx-auto text-indigo-600 mb-1.5 sm:mb-2"></i>
                 <p class="text-xs font-bold text-slate-800">Prendre une photo ou importer l image</p>
-                <p class="text-[11px] text-slate-400 mt-1">Manuscrit ou imprime (feuille bien a plat)</p>
+                <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1">Manuscrit ou imprime (feuille bien a plat)</p>
                 <input type="file" id="aiInputPhoto" accept="image/*" capture="environment" class="hidden">
               </div>
 
               <!-- Apercu photo selectionnee -->
-              <div id="aiPreviewPhotoBox" class="hidden mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-2">
-                <div class="max-h-56 overflow-hidden rounded-xl bg-slate-900 flex items-center justify-center">
-                  <img id="aiPreviewImg" src="" alt="Apercu sujet" class="max-h-56 object-contain">
+              <div id="aiPreviewPhotoBox" class="hidden mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-2.5 space-y-2">
+                <div class="max-h-52 overflow-hidden rounded-xl bg-slate-900 flex items-center justify-center">
+                  <img id="aiPreviewImg" src="" alt="Apercu sujet" class="max-h-52 object-contain">
                 </div>
                 <div class="flex items-center justify-between text-xs px-1">
-                  <span id="aiPreviewFileName" class="text-slate-700 font-bold truncate max-w-[200px]">sujet.jpg</span>
-                  <button type="button" id="btnRemoveAiPhoto" class="text-rose-600 hover:text-rose-800 font-bold">
+                  <span id="aiPreviewFileName" class="text-slate-700 font-bold truncate max-w-[180px] sm:max-w-[200px]">sujet.jpg</span>
+                  <button type="button" id="btnRemoveAiPhoto" class="text-rose-600 hover:text-rose-800 font-bold text-xs">
                     Reprendre
                   </button>
                 </div>
@@ -702,24 +561,24 @@
 
             <!-- Etape 3 : Bouton d action principal -->
             <div>
-              <div class="flex items-center gap-2 mb-2.5">
-                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-xs">3</span>
-                <h3 class="font-serif text-sm font-bold text-slate-900">Generation du document :</h3>
+              <div class="flex items-center gap-2 mb-2 sm:mb-2.5">
+                <span class="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-[11px] sm:text-xs">3</span>
+                <h3 class="font-serif text-xs sm:text-sm font-bold text-slate-900">Generation du document :</h3>
               </div>
 
               <button
                 type="button"
                 id="btnConvertPhotoToPdf"
                 onclick="runPhotoToPdfPipeline()"
-                class="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3.5 text-xs sm:text-sm font-bold text-white shadow-md transition"
+                class="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-white shadow-md transition"
               >
                 <i data-lucide="sparkles" class="h-4 w-4"></i>
                 <span>Transcrire et Compiler en PDF</span>
               </button>
             </div>
 
-            <!-- Indicateur de progression temps reel -->
-            <div id="aiProcessingState" class="hidden rounded-2xl border border-indigo-200 bg-indigo-50/80 p-4 space-y-2.5 text-xs">
+            <!-- Barre de progression -->
+            <div id="aiProcessingState" class="hidden rounded-2xl border border-indigo-200 bg-indigo-50/80 p-3.5 sm:p-4 space-y-2 text-xs">
               <div class="flex items-center justify-between font-bold text-indigo-950">
                 <span id="aiProgressMessage">Lecture de l image par l IA...</span>
                 <i data-lucide="loader-2" class="h-4 w-4 animate-spin text-indigo-600"></i>
@@ -735,12 +594,12 @@
 
         <!-- PANNEAU DROIT : Rendu Overleaf (Visionneuse PDF & Code TeX) -->
         <div class="lg:col-span-7 space-y-4">
-          <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs min-h-[620px] flex flex-col">
+          <div class="rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs min-h-[500px] sm:min-h-[620px] flex flex-col">
             
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-4">
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-bold text-slate-900">Rendu Document (Style Overleaf)</h3>
-                <p id="aiStudioSubStatus" class="text-xs text-slate-400">En attente d une premiere numerisation.</p>
+                <h3 class="font-serif text-sm sm:text-lg font-bold text-slate-900">Rendu Document (Style Overleaf)</h3>
+                <p id="aiStudioSubStatus" class="text-[11px] sm:text-xs text-slate-400">En attente d une premiere numerisation.</p>
               </div>
 
               <!-- Onglets PDF vs Code TeX -->
@@ -749,48 +608,48 @@
                   type="button"
                   id="tabStudioPdf"
                   onclick="switchStudioTab('pdf')"
-                  class="rounded-lg px-3 py-1.5 transition bg-white text-slate-900 shadow-xs flex items-center gap-1.5"
+                  class="rounded-lg px-2.5 sm:px-3 py-1.5 transition bg-white text-slate-900 shadow-xs flex items-center gap-1"
                 >
                   <i data-lucide="file-text" class="h-3.5 w-3.5 text-rose-600"></i>
-                  <span>Apercu PDF Reel</span>
+                  <span>Apercu PDF</span>
                 </button>
                 <button
                   type="button"
                   id="tabStudioTex"
                   onclick="switchStudioTab('tex')"
-                  class="rounded-lg px-3 py-1.5 transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
+                  class="rounded-lg px-2.5 sm:px-3 py-1.5 transition text-slate-600 hover:text-slate-900 flex items-center gap-1"
                 >
                   <i data-lucide="code" class="h-3.5 w-3.5 text-emerald-600"></i>
-                  <span>Code LaTeX (.tex)</span>
+                  <span>Code .tex</span>
                 </button>
               </div>
             </div>
 
             <!-- ONGLET 1 : Visionneuse PDF native -->
             <div id="studioPanelPdf" class="flex-1 flex flex-col justify-between">
-              <div id="studioPdfViewerBox" class="flex-1 rounded-2xl border border-slate-200 bg-slate-950 p-2 sm:p-3 min-h-[520px] flex items-center justify-center overflow-hidden">
+              <div id="studioPdfViewerBox" class="flex-1 rounded-2xl border border-slate-200 bg-slate-950 p-2 min-h-[420px] sm:min-h-[520px] flex items-center justify-center overflow-hidden">
                 
-                <div id="studioEmptyState" class="text-center py-20 text-slate-400 space-y-2">
-                  <i data-lucide="file-search" class="h-10 w-10 mx-auto text-slate-500"></i>
+                <div id="studioEmptyState" class="text-center py-16 sm:py-20 text-slate-400 space-y-2 px-4">
+                  <i data-lucide="file-search" class="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-slate-500"></i>
                   <p class="text-xs font-semibold text-slate-300">Aucun document n a encore ete compile.</p>
-                  <p class="text-[11px] text-slate-500">Selectionnez un gabarit, prenez votre photo et lancez la transcription.</p>
+                  <p class="text-[10px] sm:text-[11px] text-slate-500">Selectionnez un gabarit, prenez votre photo et lancez la transcription.</p>
                 </div>
 
                 <iframe
                   id="studioPdfIframe"
                   src=""
-                  class="hidden w-full h-[580px] rounded-xl border-0 bg-white"
+                  class="hidden w-full h-[450px] sm:h-[580px] rounded-xl border-0 bg-white"
                   title="Document PDF Compile"
                 ></iframe>
               </div>
 
-              <!-- Barre d actions rapides sous le PDF -->
-              <div id="studioActionsBar" class="hidden mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+              <!-- Barre d actions sous le PDF -->
+              <div id="studioActionsBar" class="hidden mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                 <button
                   type="button"
                   onclick="recompileStudioDocument()"
                   id="btnStudioRecompile"
-                  class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 transition shadow-2xs"
+                  class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition shadow-2xs"
                 >
                   <i data-lucide="refresh-cw" class="h-3.5 w-3.5 text-indigo-600"></i>
                   <span>Recompiler</span>
@@ -800,7 +659,7 @@
                   <button
                     type="button"
                     onclick="printStudioPdf()"
-                    class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 transition shadow-2xs"
+                    class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition shadow-2xs"
                   >
                     <i data-lucide="printer" class="h-3.5 w-3.5"></i>
                     <span>Imprimer</span>
@@ -808,7 +667,7 @@
                   <button
                     type="button"
                     onclick="downloadStudioPdf()"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 px-4 py-2 text-xs font-bold text-white transition shadow-xs"
+                    class="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 px-3.5 py-1.5 text-xs font-bold text-white transition shadow-xs"
                   >
                     <i data-lucide="download" class="h-4 w-4"></i>
                     <span>Telecharger PDF</span>
@@ -826,15 +685,15 @@
                     type="button"
                     onclick="copyStudioTexCode()"
                     id="btnCopyStudioTex"
-                    class="inline-flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 transition"
+                    class="inline-flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-700 transition"
                   >
                     <i data-lucide="copy" class="h-3.5 w-3.5"></i>
-                    <span>Copier le Code</span>
+                    <span>Copier</span>
                   </button>
                   <button
                     type="button"
                     onclick="downloadStudioTexFile()"
-                    class="inline-flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white transition shadow-2xs"
+                    class="inline-flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1.5 text-xs font-bold text-white transition shadow-2xs"
                   >
                     <i data-lucide="download" class="h-3.5 w-3.5"></i>
                     <span>Telecharger .tex</span>
@@ -844,8 +703,8 @@
 
               <textarea
                 id="studioTexEditor"
-                rows="24"
-                class="w-full flex-1 rounded-2xl border border-slate-800 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-100 focus:outline-none focus:border-indigo-500"
+                rows="20"
+                class="w-full flex-1 rounded-2xl border border-slate-800 bg-slate-950 p-3 sm:p-4 font-mono text-xs leading-relaxed text-slate-100 focus:outline-none focus:border-indigo-500"
                 placeholder="% Le code source LaTeX s affichera ici..."
                 spellcheck="false"
               ></textarea>
@@ -859,32 +718,187 @@
   </section>
 
   <!-- ========================================================================= -->
+  <!-- VUE 3 : LA FORMATION LATEX (2E COHORTE)                                   -->
+  <!-- ========================================================================= -->
+  <section id="viewTraining" class="hidden flex-1 pb-16">
+    
+    <div class="border-b border-slate-200 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white py-10 sm:py-16">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+        
+        <div class="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-xs font-bold text-amber-300 backdrop-blur-md mb-4 sm:mb-6">
+          <i data-lucide="award" class="h-4 w-4"></i>
+          <span>Session de Formation Pratique Intensive aux Logiciels LaTeX & TikZ</span>
+        </div>
+
+        <h1 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white max-w-3xl mx-auto leading-tight">
+          Apprenez a Rediger des Documents Mathematiques d Excellence
+        </h1>
+
+        <p class="mt-3 sm:mt-4 max-w-2xl mx-auto text-xs sm:text-sm md:text-base text-slate-300 font-normal leading-relaxed">
+          18 heures de formation pratique pour les professeurs et etudiants. Maitrisez la syntaxe LaTeX, les formules, TikZ et la mise en page d examens.
+        </p>
+
+        <div class="mt-6 sm:mt-8 inline-flex items-center gap-3 sm:gap-4 rounded-2xl border border-white/15 bg-white/5 p-3 sm:px-6 sm:py-3.5 text-left backdrop-blur-md">
+          <div class="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500 font-serif text-lg sm:text-xl font-bold text-slate-950">
+            ST
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-xs font-bold text-amber-300 uppercase tracking-wider">Sous l egide scientifique de</div>
+            <div class="font-serif text-xs sm:text-sm font-bold text-white">Pr. Saliou TOURE</div>
+            <div class="text-[10px] sm:text-[11px] text-slate-400">President de la Societe Mathematique de Cote d Ivoire (SMCI)</div>
+          </div>
+        </div>
+
+        <div class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="https://forms.gle/2sPqT34ESzQR1S5L7"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 rounded-2xl bg-amber-500 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 transition hover:bg-amber-400"
+          >
+            <i data-lucide="file-check" class="h-4 w-4"></i>
+            <span>S inscrire Gratuitement a la 2e Cohorte</span>
+          </a>
+
+          <a
+            href="https://chat.whatsapp.com/D3Z48FSKgQT57ZA9lqLdJh?mode=gi_t"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 rounded-2xl border border-emerald-500 bg-emerald-600/20 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-emerald-300 backdrop-blur-md transition hover:bg-emerald-600 hover:text-white"
+          >
+            <i data-lucide="message-circle" class="h-4 w-4"></i>
+            <span>Groupe WhatsApp Officiel Formation</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="mx-auto max-w-5xl px-4 py-8 sm:py-12 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
+      
+      <div class="text-center">
+        <h2 class="font-serif text-xl sm:text-3xl font-bold text-slate-900">
+          Syllabus Pedagogique des 18 Heures
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1">
+          Une methode progressive concue pour passer de debutant a expert autonome.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-indigo-50 text-indigo-700 px-2.5 py-1 text-xs font-bold border border-indigo-200">Module 1 - 3h</span>
+            <i data-lucide="terminal" class="h-5 w-5 text-indigo-600"></i>
+          </div>
+          <h3 class="font-serif text-sm sm:text-base font-bold text-slate-900">Environnement & Syntaxe Fondamentale</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>- Installation de TeX Live, MiKTeX, TeXstudio et Overleaf</li>
+            <li>- Structure d un preambule officiel (articles, examens)</li>
+            <li>- Gestion des accents, des polices et des marges A4</li>
+          </ul>
+        </div>
+
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-emerald-50 text-emerald-700 px-2.5 py-1 text-xs font-bold border border-emerald-200">Module 2 - 4h</span>
+            <i data-lucide="binary" class="h-5 w-5 text-emerald-600"></i>
+          </div>
+          <h3 class="font-serif text-sm sm:text-base font-bold text-slate-900">Formules Mathematiques, Matrices & Systemes</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>- Environnements amsmath, align et matrices</li>
+            <li>- Fractions, radicaux, integrales, sommes et limites</li>
+            <li>- Systemes d equations avec accolades</li>
+          </ul>
+        </div>
+
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-amber-50 text-amber-800 px-2.5 py-1 text-xs font-bold border border-amber-200">Module 3 - 5h</span>
+            <i data-lucide="pen-tool" class="h-5 w-5 text-amber-600"></i>
+          </div>
+          <h3 class="font-serif text-sm sm:text-base font-bold text-slate-900">Figures Vectorielles avec TikZ & PGFPlots</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>- Trace de configurations geometriques planes</li>
+            <li>- Courbes de fonctions et asymptotes</li>
+            <li>- Tableaux de variations avec tkz-tab</li>
+          </ul>
+        </div>
+
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-blue-50 text-blue-700 px-2.5 py-1 text-xs font-bold border border-blue-200">Module 4 - 3h</span>
+            <i data-lucide="presentation" class="h-5 w-5 text-blue-600"></i>
+          </div>
+          <h3 class="font-serif text-sm sm:text-base font-bold text-slate-900">Presentations Beamer & Diaporamas</h3>
+          <ul class="mt-3 space-y-1.5 text-xs text-slate-600">
+            <li>- Diaporamas scientifiques avec la classe Beamer</li>
+            <li>- Blocs theoremes et animations pas a pas</li>
+            <li>- Projection en classe et soutenances</li>
+          </ul>
+        </div>
+
+        <div class="col-span-1 md:col-span-2 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <span class="rounded-lg bg-purple-50 text-purple-700 px-2.5 py-1 text-xs font-bold border border-purple-200">Module 5 - 3h</span>
+            <i data-lucide="sparkles" class="h-5 w-5 text-purple-600"></i>
+          </div>
+          <h3 class="font-serif text-sm sm:text-base font-bold text-slate-900">Production d Examens Types & Automatisation</h3>
+          <p class="text-xs text-slate-600 mt-2">
+            Creation d epreuves types avec bareme en marge, gestion des corriges et export.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-slate-200 bg-indigo-50/50 p-5 sm:p-8 text-center">
+        <h3 class="font-serif text-base sm:text-lg font-bold text-indigo-950">
+          Ateliers Deployes dans 6 Poles Universitaires & Regionaux
+        </h3>
+        <p class="text-xs text-indigo-800 mt-1 max-w-xl mx-auto">
+          Sessions dispensees en presentiel et retransmises en direct.
+        </p>
+
+        <div class="mt-5 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-bold">
+          <span class="rounded-xl border border-indigo-200 bg-white px-3 sm:px-4 py-2 text-indigo-900 shadow-2xs">Abidjan (UFHB Cocody & ENS)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-3 sm:px-4 py-2 text-indigo-900 shadow-2xs">Yamoussoukro (INP-HB)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-3 sm:px-4 py-2 text-indigo-900 shadow-2xs">Bouake (Alassane Ouattara)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-3 sm:px-4 py-2 text-indigo-900 shadow-2xs">Korhogo (Peleforo Gon Coulibaly)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-3 sm:px-4 py-2 text-indigo-900 shadow-2xs">Daloa (Jean Lorougnon Guede)</span>
+          <span class="rounded-xl border border-indigo-200 bg-white px-3 sm:px-4 py-2 text-indigo-900 shadow-2xs">San-Pedro (Universite de San-Pedro)</span>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
   <!-- CARROUSEL PHOTOS DE LA 2E COHORTE                                         -->
   <!-- ========================================================================= -->
-  <section id="sectionCohorte2Carousel" class="border-t border-slate-200 bg-gradient-to-b from-white via-slate-50/50 to-slate-100/60 py-12 overflow-hidden relative">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-6">
-      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+  <section id="sectionCohorte2Carousel" class="border-t border-slate-200 bg-gradient-to-b from-white via-slate-50/50 to-slate-100/60 py-8 sm:py-12 overflow-hidden relative">
+    <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 mb-5 sm:mb-6">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
         <div>
-          <div class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 px-3.5 py-1 text-xs font-bold text-indigo-700 mb-2.5 shadow-2xs">
+          <div class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 px-3 py-1 text-xs font-bold text-indigo-700 mb-2 shadow-2xs">
             <i data-lucide="camera" class="h-3.5 w-3.5 text-indigo-600"></i>
             <span>Galerie Souvenirs - 2e Cohorte LaTeX en Action</span>
           </div>
-          <h3 class="font-serif text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h3 class="font-serif text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Les Moments Forts de la Promotion
           </h3>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-2xl leading-relaxed">
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5 max-w-2xl leading-relaxed">
             Cliquez sur un cliche pour l agrandir en haute resolution.
           </p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <div class="inline-flex items-center rounded-2xl bg-white border border-slate-200 p-1 shadow-2xs text-xs font-bold">
+          <div class="inline-flex items-center rounded-2xl bg-white border border-slate-200 p-1 shadow-2xs text-[11px] sm:text-xs font-bold">
             <a
               id="linkDriveJour1"
               href="https://drive.google.com/drive/folders/1c5_OxRSe8AXaSBWGp9-rUw6ex3AglS2P?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
-              class="rounded-xl px-2.5 py-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
+              class="rounded-xl px-2.5 py-1 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
             >
               J1 Fondations
             </a>
@@ -894,7 +908,7 @@
               href="https://drive.google.com/drive/folders/1jPg8ERdtQh8HsTvN3As7fG8cvCbyZEYp?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
-              class="rounded-xl px-2.5 py-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
+              class="rounded-xl px-2.5 py-1 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
             >
               J2 TikZ & Maths
             </a>
@@ -904,7 +918,7 @@
               href="https://drive.google.com/drive/folders/1aiG3tAApbeF5T8zFtrQj4ZA-Qup6soBt?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
-              class="rounded-xl px-2.5 py-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
+              class="rounded-xl px-2.5 py-1 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition"
             >
               J3 Cloture
             </a>
@@ -913,7 +927,7 @@
           <button
             type="button"
             onclick="shuffleCarouselPhotos()"
-            class="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition"
+            class="inline-flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 transition"
           >
             <i data-lucide="shuffle" class="h-3.5 w-3.5 text-indigo-600"></i>
             <span>Melanger</span>
@@ -922,11 +936,11 @@
       </div>
     </div>
 
-    <div class="relative w-full overflow-hidden py-3 select-none group">
-      <div class="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-slate-100/90 via-slate-50/60 to-transparent z-10"></div>
-      <div class="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-slate-100/90 via-slate-50/60 to-transparent z-10"></div>
+    <div class="relative w-full overflow-hidden py-2 select-none group">
+      <div class="pointer-events-none absolute left-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-r from-slate-100/90 via-slate-50/60 to-transparent z-10"></div>
+      <div class="pointer-events-none absolute right-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-l from-slate-100/90 via-slate-50/60 to-transparent z-10"></div>
 
-      <div id="carouselMarqueeTrack" class="animate-marquee flex items-center gap-4"></div>
+      <div id="carouselMarqueeTrack" class="animate-marquee flex items-center gap-3 sm:gap-4"></div>
     </div>
   </section>
 
@@ -940,9 +954,9 @@
       class="relative max-w-4xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-700/80 text-white flex flex-col cursor-default animate-scale-in"
       onclick="event.stopPropagation()"
     >
-      <div class="px-5 py-3.5 flex items-center justify-between border-b border-slate-800 bg-slate-950/90">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <span id="lightboxDayBadge" class="shrink-0 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-3 py-1 text-xs font-bold font-mono">
+      <div class="px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between border-b border-slate-800 bg-slate-950/90">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="lightboxDayBadge" class="shrink-0 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-2.5 py-0.5 text-[11px] font-bold font-mono">
             JOUR 1
           </span>
           <span id="lightboxTitle" class="text-xs sm:text-sm font-semibold text-slate-200 truncate">
@@ -950,19 +964,17 @@
           </span>
         </div>
 
-        <div class="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onclick="closePhotoLightbox()"
-            class="h-9 w-9 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center transition"
-            title="Fermer"
-          >
-            <i data-lucide="x" class="h-5 w-5"></i>
-          </button>
-        </div>
+        <button
+          type="button"
+          onclick="closePhotoLightbox()"
+          class="h-8 w-8 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center transition shrink-0"
+          title="Fermer"
+        >
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
       </div>
 
-      <div class="relative bg-black/80 flex items-center justify-center p-3 sm:p-5 min-h-[320px] max-h-[72vh] overflow-hidden select-none">
+      <div class="relative bg-black/80 flex items-center justify-center p-2 sm:p-5 min-h-[280px] max-h-[72vh] overflow-hidden select-none">
         <img
           id="lightboxImage"
           src=""
@@ -971,7 +983,7 @@
         />
       </div>
 
-      <div class="px-5 py-3 bg-slate-950/90 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800">
+      <div class="px-4 py-2.5 bg-slate-950/90 flex items-center justify-between text-[11px] sm:text-xs text-slate-400 border-t border-slate-800">
         <span class="truncate">Formation intensive LaTeX - 2e Cohorte MATEX Cote d Ivoire</span>
         <button
           type="button"
@@ -985,15 +997,15 @@
   </div>
 
   <!-- PIED DE PAGE -->
-  <footer class="border-t border-slate-200 bg-white py-12 text-slate-600">
+  <footer class="border-t border-slate-200 bg-white py-8 sm:py-12 text-slate-600">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div class="col-span-1 md:col-span-2 space-y-3">
-          <div class="flex items-center gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-900 text-white font-serif text-xl font-bold">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8">
+        <div class="col-span-1 md:col-span-2 space-y-2.5 sm:space-y-3">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-indigo-900 text-white font-serif text-lg sm:text-xl font-bold">
               M
             </div>
-            <span class="font-serif text-lg font-black text-slate-900">MATEX</span>
+            <span class="font-serif text-base sm:text-lg font-black text-slate-900">MATEX</span>
           </div>
           <p class="text-xs text-slate-500 leading-relaxed max-w-md">
             Plateforme nationale d emulation et de mutualisation pedagogique des mathematiques en Cote d Ivoire.
@@ -1001,10 +1013,10 @@
         </div>
 
         <div>
-          <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-slate-900 mb-3">
+          <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-slate-900 mb-2 sm:mb-3">
             Parcours Scolaires
           </h4>
-          <ul class="space-y-2 text-xs">
+          <ul class="space-y-1.5 text-xs">
             <li><button type="button" class="hover:text-indigo-600 transition" onclick="setCycleFilter('primaire')">Primaire (CP1 - CM2)</button></li>
             <li><button type="button" class="hover:text-indigo-600 transition" onclick="setCycleFilter('college')">1er Cycle / College (6e - 3e)</button></li>
             <li><button type="button" class="hover:text-indigo-600 transition" onclick="setCycleFilter('lycee')">2nd Cycle / Lycee (2nde - Tle)</button></li>
@@ -1013,7 +1025,7 @@
         </div>
 
         <div>
-          <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-slate-900 mb-3">
+          <h4 class="font-serif font-bold text-xs uppercase tracking-wider text-slate-900 mb-2 sm:mb-3">
             Soutien & Contribution
           </h4>
           <p class="text-xs text-slate-500 leading-relaxed">
@@ -1023,14 +1035,14 @@
           <button
             type="button"
             onclick="openDonateModal()"
-            class="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-950 hover:bg-amber-400 transition"
+            class="mt-2.5 inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-bold text-slate-950 hover:bg-amber-400 transition"
           >
             <i data-lucide="heart" class="h-3 w-3 fill-slate-950"></i> Faire un Don Solidaire
           </button>
         </div>
       </div>
 
-      <div class="mt-10 border-t border-slate-100 pt-6 text-center text-[11px] text-slate-400">
+      <div class="mt-8 border-t border-slate-100 pt-5 text-center text-[10px] sm:text-[11px] text-slate-400">
         MATEX Cote d Ivoire. Developpe pour la communaute educative nationale.
       </div>
     </div>
@@ -1042,11 +1054,9 @@
   <div id="modalDocumentViewer" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-fade-in">
     <div class="relative w-full max-w-5xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl flex flex-col max-h-[96vh] overflow-hidden">
       
-      <!-- Top Bar de la visionneuse -->
-      <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3 bg-slate-950 text-white">
-        
-        <div class="flex items-center gap-3 overflow-hidden">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white font-serif font-bold text-sm">
+      <div class="flex items-center justify-between border-b border-slate-800 px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-950 text-white">
+        <div class="flex items-center gap-2.5 overflow-hidden">
+          <div class="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white font-serif font-bold text-xs sm:text-sm">
             PDF
           </div>
           <div class="truncate">
@@ -1059,32 +1069,28 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-1 rounded-xl bg-slate-900 p-1 text-xs font-bold border border-slate-800">
-          <button type="button" id="viewerTabPdf" class="rounded-lg px-3 py-1.5 transition bg-white text-slate-900 shadow-xs flex items-center gap-1.5">
+        <div class="flex items-center gap-1 rounded-xl bg-slate-900 p-1 text-[11px] sm:text-xs font-bold border border-slate-800">
+          <button type="button" id="viewerTabPdf" class="rounded-lg px-2.5 sm:px-3 py-1 transition bg-white text-slate-900 shadow-xs flex items-center gap-1">
             <i data-lucide="file-text" class="h-3.5 w-3.5 text-rose-500"></i>
-            <span>Apercu PDF Reel</span>
+            <span>PDF</span>
           </button>
-          <button type="button" id="viewerTabLatex" class="rounded-lg px-3 py-1.5 transition text-slate-400 hover:text-white flex items-center gap-1.5">
+          <button type="button" id="viewerTabLatex" class="rounded-lg px-2.5 sm:px-3 py-1 transition text-slate-400 hover:text-white flex items-center gap-1">
             <i data-lucide="file-code" class="h-3.5 w-3.5 text-emerald-400"></i>
-            <span>Source LaTeX (.tex)</span>
+            <span>LaTeX</span>
           </button>
         </div>
 
-        <div class="flex items-center">
-          <button
-            type="button"
-            id="btnCloseDocumentViewer"
-            class="h-9 w-9 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center text-xs transition"
-            title="Fermer"
-          >
-            <i data-lucide="x" class="h-5 w-5"></i>
-          </button>
-        </div>
-
+        <button
+          type="button"
+          id="btnCloseDocumentViewer"
+          class="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center text-xs transition ml-1"
+          title="Fermer"
+        >
+          <i data-lucide="x" class="h-4 w-4 sm:h-5 sm:w-5"></i>
+        </button>
       </div>
 
-      <!-- Corps de la visionneuse -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-900/50">
+      <div class="flex-1 overflow-y-auto p-2 sm:p-6 bg-slate-900/50">
         <div id="viewerContentPdf">
           <div id="authenticA4Sheet" class="a4-paper-sheet animate-scale-in"></div>
         </div>
@@ -1097,8 +1103,8 @@
   <!-- ========================================================================= -->
   <!-- MODAL 2 : PASSERELLE DE DEBLOCAGE                                         -->
   <!-- ========================================================================= -->
-  <div id="modalUnlockGateway" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in">
+  <div id="modalUnlockGateway" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-8 animate-scale-in">
       <button
         type="button"
         id="btnCloseUnlockGateway"
@@ -1108,59 +1114,59 @@
       </button>
 
       <div class="text-center">
-        <div class="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 shadow-2xs mb-3">
-          <i data-lucide="unlock" class="h-7 w-7"></i>
+        <div class="flex h-12 w-12 sm:h-14 sm:w-14 mx-auto items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 shadow-2xs mb-2.5">
+          <i data-lucide="unlock" class="h-6 w-6 sm:h-7 sm:w-7"></i>
         </div>
-        <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
+        <h3 class="font-serif text-lg sm:text-2xl font-black text-slate-900">
           Debloquer les Fichiers Sources
         </h3>
         <p id="unlockDocTitle" class="text-xs text-indigo-700 font-bold mt-1">
           Ressource selectionnee
         </p>
-        <p class="text-xs text-slate-600 mt-2 max-w-md mx-auto leading-relaxed">
+        <p class="text-xs text-slate-600 mt-1.5 max-w-md mx-auto leading-relaxed">
           Pour maintenir cette plateforme libre et accessible a tous :
         </p>
       </div>
 
-      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="flex flex-col justify-between rounded-2xl border-2 border-emerald-500 bg-emerald-50/40 p-5 text-left">
+      <div class="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div class="flex flex-col justify-between rounded-2xl border-2 border-emerald-500 bg-emerald-50/40 p-4 sm:p-5 text-left">
           <div>
-            <span class="rounded-md bg-emerald-600 text-white px-2 py-0.5 text-[10px] font-extrabold uppercase">
+            <span class="rounded-md bg-emerald-600 text-white px-2 py-0.5 text-[9px] sm:text-[10px] font-extrabold uppercase">
               100% Gratuit
             </span>
-            <h4 class="font-serif font-bold text-sm text-slate-900 mt-2">
+            <h4 class="font-serif font-bold text-xs sm:text-sm text-slate-900 mt-2">
               Rejoindre MATEX
             </h4>
-            <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
+            <p class="text-[10px] sm:text-[11px] text-slate-600 mt-1 leading-relaxed">
               Integrez le groupe WhatsApp national des enseignants.
             </p>
           </div>
           <button
             type="button"
             id="btnUnlockGoJoin"
-            class="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
+            class="mt-3.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2 sm:py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition"
           >
             <i data-lucide="users" class="h-3.5 w-3.5"></i>
             <span>Integrer le Reseau</span>
           </button>
         </div>
 
-        <div class="flex flex-col justify-between rounded-2xl border-2 border-amber-500 bg-amber-50/40 p-5 text-left">
+        <div class="flex flex-col justify-between rounded-2xl border-2 border-amber-500 bg-amber-50/40 p-4 sm:p-5 text-left">
           <div>
-            <span class="rounded-md bg-amber-500 text-slate-950 px-2 py-0.5 text-[10px] font-extrabold uppercase">
+            <span class="rounded-md bg-amber-500 text-slate-950 px-2 py-0.5 text-[9px] sm:text-[10px] font-extrabold uppercase">
               Soutien Pedagogique
             </span>
-            <h4 class="font-serif font-bold text-sm text-slate-900 mt-2">
+            <h4 class="font-serif font-bold text-xs sm:text-sm text-slate-900 mt-2">
               Faire un Don Solidaire
             </h4>
-            <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
+            <p class="text-[10px] sm:text-[11px] text-slate-600 mt-1 leading-relaxed">
               Des 5 000 FCFA via Wave / Orange Money au <strong>07 48 78 22 05</strong>.
             </p>
           </div>
           <button
             type="button"
             id="btnUnlockGoDonate"
-            class="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl bg-amber-500 py-2.5 text-xs font-bold text-slate-950 shadow-xs hover:bg-amber-400 transition"
+            class="mt-3.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-amber-500 py-2 sm:py-2.5 text-xs font-bold text-slate-950 shadow-xs hover:bg-amber-400 transition"
           >
             <i data-lucide="heart" class="h-3.5 w-3.5 fill-slate-950"></i>
             <span>Faire un Don</span>
@@ -1173,8 +1179,8 @@
   <!-- ========================================================================= -->
   <!-- MODAL 3 : DON SOLIDAIRE                                                   -->
   <!-- ========================================================================= -->
-  <div id="modalDonate" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in">
+  <div id="modalDonate" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-8 animate-scale-in">
       <button
         type="button"
         id="btnCloseDonate"
@@ -1185,10 +1191,10 @@
 
       <div id="donateFormSection">
         <div class="text-center">
-          <div class="flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 shadow-2xs mb-2">
+          <div class="flex h-11 w-11 sm:h-12 sm:w-12 mx-auto items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 shadow-2xs mb-2">
             <i data-lucide="heart" class="h-6 w-6 fill-amber-500 text-amber-500"></i>
           </div>
-          <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
+          <h3 class="font-serif text-lg sm:text-2xl font-black text-slate-900">
             Soutenez la Communaute MATEX
           </h3>
           <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
@@ -1196,22 +1202,22 @@
           </p>
         </div>
 
-        <form id="formDonateSubmission" class="mt-6 space-y-4">
+        <form id="formDonateSubmission" class="mt-5 sm:mt-6 space-y-3.5 sm:space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-2">
               Choisissez votre palier solidaire (FCFA) :
             </label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button type="button" class="donate-tier-btn rounded-xl border-2 border-amber-500 bg-amber-50/80 p-3 text-center text-xs font-bold text-amber-950 shadow-xs transition" data-tier="tier-1">
+              <button type="button" class="donate-tier-btn rounded-xl border-2 border-amber-500 bg-amber-50/80 p-2.5 text-center text-xs font-bold text-amber-950 shadow-xs transition" data-tier="tier-1">
                 5 000 F
               </button>
-              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition" data-tier="tier-2">
+              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-2.5 text-center text-xs font-bold text-slate-700 hover:bg-slate-50 transition" data-tier="tier-2">
                 10 000 F
               </button>
-              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition" data-tier="tier-3">
+              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-2.5 text-center text-xs font-bold text-slate-700 hover:bg-slate-50 transition" data-tier="tier-3">
                 25 000 F
               </button>
-              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition" data-tier="tier-4">
+              <button type="button" class="donate-tier-btn rounded-xl border border-slate-200 bg-white p-2.5 text-center text-xs font-bold text-slate-700 hover:bg-slate-50 transition" data-tier="tier-4">
                 50 000 F
               </button>
             </div>
@@ -1222,18 +1228,18 @@
                 id="donateCustomAmount"
                 min="5000"
                 step="1000"
-                placeholder="Ou saisir un autre montant (Min. 5 000 FCFA)..."
+                placeholder="Autre montant (Min. 5 000 FCFA)..."
                 class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800 transition focus:border-amber-500 focus:bg-white focus:outline-none"
               >
             </div>
 
-            <p id="donateImpactDesc" class="mt-2 text-[11px] text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-2.5 font-medium leading-relaxed">
+            <p id="donateImpactDesc" class="mt-2 text-[10px] sm:text-[11px] text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-2.5 font-medium leading-relaxed">
               Montant minimal solidaire (Des 5 000 FCFA) : Contribue a l hebergement des sources LaTeX et aux ateliers.
             </p>
           </div>
 
-          <div class="rounded-2xl border-2 border-slate-900 bg-slate-900 text-white p-4 space-y-2">
-            <div class="flex items-center justify-between text-[11px] font-bold text-amber-400">
+          <div class="rounded-2xl border-2 border-slate-900 bg-slate-900 text-white p-3.5 sm:p-4 space-y-1.5">
+            <div class="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-amber-400">
               <span>DESTINATAIRE OFFICIEL</span>
               <span class="rounded bg-amber-500/20 px-2 py-0.5 text-amber-300 font-mono">WAVE / ORANGE</span>
             </div>
@@ -1241,7 +1247,7 @@
               Coordination & Tresorerie Generale MATEX CI
             </div>
             <div class="flex items-center justify-between pt-1">
-              <div class="font-mono text-lg font-black text-amber-300">
+              <div class="font-mono text-base sm:text-lg font-black text-amber-300">
                 07 48 78 22 05
               </div>
               <button
@@ -1258,14 +1264,14 @@
             <button
               type="button"
               id="donateOpWave"
-              class="flex-1 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 p-3 text-center text-xs font-bold text-indigo-900 transition"
+              class="flex-1 rounded-xl border-2 border-indigo-600 bg-indigo-50/60 p-2.5 text-center text-xs font-bold text-indigo-900 transition"
             >
               Don par Wave
             </button>
             <button
               type="button"
               id="donateOpOrange"
-              class="flex-1 rounded-xl border border-slate-200 bg-white p-3 text-center text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+              class="flex-1 rounded-xl border border-slate-200 bg-white p-2.5 text-center text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
             >
               Orange Money
             </button>
@@ -1328,10 +1334,10 @@
       </div>
 
       <div id="donateSuccessSection" class="hidden text-center py-6 space-y-4">
-        <div class="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
-          <i data-lucide="check-circle" class="h-8 w-8"></i>
+        <div class="flex h-14 w-14 sm:h-16 sm:w-16 mx-auto items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
+          <i data-lucide="check-circle" class="h-7 w-7 sm:h-8 sm:w-8"></i>
         </div>
-        <h3 class="font-serif text-2xl font-black text-slate-900">
+        <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
           Merci pour votre soutien !
         </h3>
         <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
@@ -1340,7 +1346,7 @@
         <button
           type="button"
           id="btnDonateSuccessFinish"
-          class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+          class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
         >
           Fermer
         </button>
@@ -1352,8 +1358,8 @@
   <!-- ========================================================================= -->
   <!-- MODAL 4 : REJOINDRE LA COMMUNAUTE                                         -->
   <!-- ========================================================================= -->
-  <div id="modalJoin" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in">
+  <div id="modalJoin" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-8 animate-scale-in">
       <button
         type="button"
         id="btnCloseJoin"
@@ -1364,10 +1370,10 @@
 
       <div id="joinFormSection">
         <div class="text-center">
-          <div class="flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs mb-2">
+          <div class="flex h-11 w-11 sm:h-12 sm:w-12 mx-auto items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs mb-2">
             <i data-lucide="users" class="h-6 w-6"></i>
           </div>
-          <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
+          <h3 class="font-serif text-lg sm:text-2xl font-black text-slate-900">
             Rejoindre la Communaute Nationale MATEX
           </h3>
           <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
@@ -1375,7 +1381,7 @@
           </p>
         </div>
 
-        <form id="formJoinMember" class="mt-6 space-y-4">
+        <form id="formJoinMember" class="mt-5 sm:mt-6 space-y-3.5 sm:space-y-4">
           <div>
             <label for="joinFullName" class="block text-[11px] font-bold text-slate-700 mb-1">
               Nom et Prenoms :
@@ -1492,10 +1498,10 @@
       </div>
 
       <div id="joinSuccessSection" class="hidden text-center py-6 space-y-4">
-        <div class="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
-          <i data-lucide="check-circle" class="h-8 w-8"></i>
+        <div class="flex h-14 w-14 sm:h-16 sm:w-16 mx-auto items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
+          <i data-lucide="check-circle" class="h-7 w-7 sm:h-8 sm:w-8"></i>
         </div>
-        <h3 class="font-serif text-2xl font-black text-slate-900">
+        <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900">
           Bienvenue dans la Famille MATEX
         </h3>
         <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
@@ -1504,7 +1510,7 @@
         <button
           type="button"
           id="btnJoinSuccessFinish"
-          class="text-xs text-slate-400 hover:text-slate-700 underline font-semibold mt-4"
+          class="text-xs text-slate-400 hover:text-slate-700 underline font-semibold mt-3"
         >
           Fermer
         </button>
@@ -1516,8 +1522,8 @@
   <!-- ========================================================================= -->
   <!-- MODAL 5 : DEPOSER UN DOCUMENT                                             -->
   <!-- ========================================================================= -->
-  <div id="modalSubmit" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-    <div class="relative w-full max-w-3xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 animate-scale-in max-h-[94vh] overflow-y-auto">
+  <div id="modalSubmit" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+    <div class="relative w-full max-w-3xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-8 animate-scale-in max-h-[94vh] overflow-y-auto">
       
       <button
         type="button"
@@ -1527,24 +1533,24 @@
         <i data-lucide="x" class="h-4 w-4"></i>
       </button>
 
-      <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
         <div>
-          <h3 class="font-serif text-xl font-bold text-slate-900">Deposer une Ressource Pedagogique</h3>
-          <p class="text-xs text-slate-500">Partagez vos devoirs, cours et fichiers LaTeX avec la communaute.</p>
+          <h3 class="font-serif text-lg sm:text-xl font-bold text-slate-900">Deposer une Ressource Pedagogique</h3>
+          <p class="text-[11px] sm:text-xs text-slate-500">Partagez vos devoirs, cours et fichiers LaTeX avec la communaute.</p>
         </div>
 
-        <div class="flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-xs font-bold border border-slate-200">
-          <button type="button" id="btnSubmitTabForm" class="rounded-lg px-3 py-1.5 transition bg-white text-slate-900 shadow-xs">
-            Formulaire de Depot
+        <div class="flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-[11px] sm:text-xs font-bold border border-slate-200">
+          <button type="button" id="btnSubmitTabForm" class="rounded-lg px-2.5 sm:px-3 py-1 transition bg-white text-slate-900 shadow-xs">
+            Formulaire
           </button>
-          <button type="button" id="btnSubmitTabCurriculum" class="rounded-lg px-3 py-1.5 transition text-slate-600 hover:text-slate-900">
-            Referentiel des Lecons
+          <button type="button" id="btnSubmitTabCurriculum" class="rounded-lg px-2.5 sm:px-3 py-1 transition text-slate-600 hover:text-slate-900">
+            Referentiel
           </button>
         </div>
       </div>
 
       <div id="submitTabContentForm">
-        <form id="formSubmitDocument" class="space-y-4">
+        <form id="formSubmitDocument" class="space-y-3.5 sm:space-y-4">
           
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
@@ -1646,32 +1652,32 @@
             </div>
           </div>
 
-          <div class="space-y-3">
+          <div class="space-y-2.5">
             <div class="flex items-center justify-between">
               <label class="block text-[11px] font-bold text-slate-800">
                 Fichiers de la Ressource (.pdf et/ou .tex) :
               </label>
-              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                <i data-lucide="shield-check" class="h-3 w-3 text-emerald-600"></i> Standard National MATEX
+              <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <i data-lucide="shield-check" class="h-3 w-3 text-emerald-600"></i> Standard National
               </span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div id="submitPdfDropZone" class="rounded-2xl border-2 border-dashed border-rose-200 bg-rose-50/30 hover:border-rose-400 hover:bg-rose-50/60 p-3.5 space-y-2.5 shadow-2xs transition">
+              <div id="submitPdfDropZone" class="rounded-2xl border-2 border-dashed border-rose-200 bg-rose-50/30 hover:border-rose-400 hover:bg-rose-50/60 p-3 space-y-2 transition">
                 <div class="flex items-center justify-between">
                   <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800">
                     <span class="flex h-5 w-5 items-center justify-center rounded-md bg-rose-600 text-white text-[10px] font-bold">PDF</span>
                     Fichier PDF (.pdf)
                   </span>
-                  <span class="text-[10px] font-semibold text-rose-600 bg-rose-100/70 px-1.5 py-0.5 rounded">Rendu final</span>
+                  <span class="text-[9px] font-semibold text-rose-600 bg-rose-100/70 px-1.5 py-0.2 rounded">Rendu final</span>
                 </div>
 
-                <div id="submitPdfEmptyState" class="space-y-1.5 text-center">
-                  <label for="submitPdfInput" class="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-300 bg-white hover:bg-rose-50 text-rose-700 py-2.5 px-3 text-xs font-bold cursor-pointer transition shadow-2xs">
+                <div id="submitPdfEmptyState" class="space-y-1 text-center">
+                  <label for="submitPdfInput" class="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-300 bg-white hover:bg-rose-50 text-rose-700 py-2 px-3 text-xs font-bold cursor-pointer transition shadow-2xs">
                     <i data-lucide="file-up" class="h-4 w-4"></i>
                     <span>Choisir le fichier .pdf</span>
                   </label>
-                  <p class="text-[10px] text-slate-400 font-medium">ou glissez-deposez le .pdf ici</p>
+                  <p class="text-[10px] text-slate-400 font-medium">ou glissez-deposez ici</p>
                   <input type="file" id="submitPdfInput" accept=".pdf" class="hidden">
                 </div>
 
@@ -1689,21 +1695,21 @@
                 </div>
               </div>
 
-              <div id="submitTexDropZone" class="rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/30 hover:border-emerald-400 hover:bg-emerald-50/60 p-3.5 space-y-2.5 shadow-2xs transition">
+              <div id="submitTexDropZone" class="rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/30 hover:border-emerald-400 hover:bg-emerald-50/60 p-3 space-y-2 transition">
                 <div class="flex items-center justify-between">
                   <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800">
                     <span class="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-600 text-white text-[10px] font-bold">TEX</span>
                     Source LaTeX (.tex)
                   </span>
-                  <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-100/70 px-1.5 py-0.5 rounded">Code editable</span>
+                  <span class="text-[9px] font-semibold text-emerald-600 bg-emerald-100/70 px-1.5 py-0.2 rounded">Code source</span>
                 </div>
 
-                <div id="submitTexEmptyState" class="space-y-1.5 text-center">
-                  <label for="submitTexInput" class="w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-700 py-2.5 px-3 text-xs font-bold cursor-pointer transition shadow-2xs">
+                <div id="submitTexEmptyState" class="space-y-1 text-center">
+                  <label for="submitTexInput" class="w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-700 py-2 px-3 text-xs font-bold cursor-pointer transition shadow-2xs">
                     <i data-lucide="code" class="h-4 w-4"></i>
                     <span>Choisir le fichier .tex</span>
                   </label>
-                  <p class="text-[10px] text-slate-400 font-medium">ou glissez-deposez le .tex ici</p>
+                  <p class="text-[10px] text-slate-400 font-medium">ou glissez-deposez ici</p>
                   <input type="file" id="submitTexInput" accept=".tex" class="hidden">
                 </div>
 
@@ -1722,7 +1728,7 @@
               </div>
             </div>
 
-            <div id="submitFormatErrorAlert" class="hidden rounded-xl border border-rose-300 bg-rose-50 p-2.5 text-xs text-rose-800 flex items-center gap-2">
+            <div id="submitFormatErrorAlert" class="hidden rounded-xl border border-rose-300 bg-rose-50 p-2 text-xs text-rose-800 flex items-center gap-2">
               <i data-lucide="alert-circle" class="h-4 w-4 text-rose-600 shrink-0"></i>
               <span id="submitFormatErrorText">Format non supporte.</span>
             </div>
@@ -1750,63 +1756,63 @@
   <!-- MODAL 6 : REFERENTIEL PROGRESSIONS DPFC 2026-2027                         -->
   <!-- ========================================================================= -->
   <div id="modalCurriculum" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-fade-in">
-    <div class="relative w-full max-w-6xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-8 animate-scale-in max-h-[94vh] flex flex-col overflow-hidden">
+    <div class="relative w-full max-w-6xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-4 sm:p-8 animate-scale-in max-h-[94vh] flex flex-col overflow-hidden">
       
       <button
         type="button"
         onclick="closeCurriculumModal()"
-        class="absolute top-4 right-4 h-9 w-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 flex items-center justify-center transition z-10"
+        class="absolute top-4 right-4 h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 flex items-center justify-center transition z-10"
         title="Fermer"
       >
         <i data-lucide="x" class="h-4 w-4"></i>
       </button>
 
-      <div class="border-b border-slate-200 pb-4 mb-4 shrink-0">
-        <div class="flex flex-wrap items-center gap-2 mb-1.5">
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-extrabold text-emerald-800 border border-emerald-200">
-            Homologation Officielle DPFC / MENAET
+      <div class="border-b border-slate-200 pb-3 mb-3 shrink-0">
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+          <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-extrabold text-emerald-800 border border-emerald-200">
+            Homologation DPFC / MENAET
           </span>
-          <span class="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-3 py-1 text-xs font-extrabold text-indigo-800 border border-indigo-200">
-            Annee Scolaire 2026-2027
+          <span class="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] sm:text-xs font-extrabold text-indigo-800 border border-indigo-200">
+            2026-2027
           </span>
         </div>
-        <h3 class="font-serif text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+        <h3 class="font-serif text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
           Progressions Annuelles Pedagogiques de Mathematiques
         </h3>
-        <p class="text-xs text-slate-600 mt-1 max-w-4xl leading-relaxed">
+        <p class="text-[11px] sm:text-xs text-slate-600 mt-0.5 max-w-4xl leading-relaxed">
           Referentiel national officiel de la Direction de la Pedagogie et de la Formation Continue (DPFC).
         </p>
       </div>
 
-      <div class="space-y-3 pb-3 shrink-0 border-b border-slate-100">
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+      <div class="space-y-2.5 pb-2.5 shrink-0 border-b border-slate-100">
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold whitespace-nowrap no-scrollbar">
           <button
             type="button"
-            class="curriculum-cycle-btn rounded-xl px-3.5 py-2 transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            class="curriculum-cycle-btn shrink-0 rounded-xl px-3 py-1.5 transition flex items-center gap-1 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             data-cycle="primaire"
             onclick="setCurriculumCycle('primaire')"
           >
-            <span>Primaire (CP1 - CM2)</span>
+            <span>Primaire</span>
           </button>
           <button
             type="button"
-            class="curriculum-cycle-btn rounded-xl px-3.5 py-2 transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-xs"
+            class="curriculum-cycle-btn shrink-0 rounded-xl px-3 py-1.5 transition flex items-center gap-1 bg-indigo-600 text-white shadow-xs"
             data-cycle="college"
             onclick="setCurriculumCycle('college')"
           >
-            <span>1er Cycle / College (6e - 3e)</span>
+            <span>1er Cycle (College)</span>
           </button>
           <button
             type="button"
-            class="curriculum-cycle-btn rounded-xl px-3.5 py-2 transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            class="curriculum-cycle-btn shrink-0 rounded-xl px-3 py-1.5 transition flex items-center gap-1 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             data-cycle="lycee"
             onclick="setCurriculumCycle('lycee')"
           >
-            <span>2nd Cycle / Lycee (2nde - Tle)</span>
+            <span>2nd Cycle (Lycee)</span>
           </button>
           <button
             type="button"
-            class="curriculum-cycle-btn rounded-xl px-3.5 py-2 transition flex items-center gap-1.5 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            class="curriculum-cycle-btn shrink-0 rounded-xl px-3 py-1.5 transition flex items-center gap-1 border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
             data-cycle="superieur"
             onclick="setCurriculumCycle('superieur')"
           >
@@ -1814,14 +1820,14 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          <div class="md:col-span-6 flex items-center gap-1.5 overflow-x-auto pb-1" id="curriculumGradePills"></div>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
+          <div class="md:col-span-6 flex items-center gap-1 overflow-x-auto pb-1 whitespace-nowrap no-scrollbar" id="curriculumGradePills"></div>
 
           <div class="md:col-span-3 flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold border border-slate-200">
-            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-2 text-center transition bg-white text-slate-900 shadow-2xs" data-trim="all" onclick="setCurriculumTrimester('all')">Tous</button>
-            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-2 text-center transition text-slate-600 hover:text-slate-900" data-trim="1" onclick="setCurriculumTrimester(1)">T1</button>
-            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-2 text-center transition text-slate-600 hover:text-slate-900" data-trim="2" onclick="setCurriculumTrimester(2)">T2</button>
-            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-2 text-center transition text-slate-600 hover:text-slate-900" data-trim="3" onclick="setCurriculumTrimester(3)">T3</button>
+            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-1.5 text-center transition bg-white text-slate-900 shadow-2xs" data-trim="all" onclick="setCurriculumTrimester('all')">Tous</button>
+            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-1.5 text-center transition text-slate-600 hover:text-slate-900" data-trim="1" onclick="setCurriculumTrimester(1)">T1</button>
+            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-1.5 text-center transition text-slate-600 hover:text-slate-900" data-trim="2" onclick="setCurriculumTrimester(2)">T2</button>
+            <button type="button" class="curriculum-trim-btn flex-1 rounded-lg py-1 px-1.5 text-center transition text-slate-600 hover:text-slate-900" data-trim="3" onclick="setCurriculumTrimester(3)">T3</button>
           </div>
 
           <div class="md:col-span-3 relative">
@@ -1837,71 +1843,71 @@
         </div>
       </div>
 
-      <div id="curriculumClassHeader" class="my-3 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 shrink-0 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div id="curriculumClassHeader" class="my-2.5 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-3 sm:p-4 shrink-0 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div>
           <div class="flex items-center gap-2">
             <span id="curriculumGradeBadge" class="rounded-lg bg-indigo-500/30 border border-indigo-400/30 px-2 py-0.5 text-xs font-black text-indigo-200">6e</span>
-            <h4 id="curriculumGradeFullName" class="font-serif text-base sm:text-lg font-bold text-white">Classe de Sixieme (6e)</h4>
+            <h4 id="curriculumGradeFullName" class="font-serif text-sm sm:text-lg font-bold text-white">Classe de Sixieme (6e)</h4>
           </div>
-          <p id="curriculumGradeDescription" class="text-xs text-slate-300 mt-1">Programme officiel national 2026-2027</p>
+          <p id="curriculumGradeDescription" class="text-[10px] sm:text-xs text-slate-300 mt-0.5">Programme officiel national 2026-2027</p>
         </div>
 
-        <div class="flex items-center gap-3 shrink-0">
-          <div class="rounded-xl bg-white/10 px-3 py-2 text-center border border-white/10">
-            <div id="curriculumAnnualHours" class="font-mono text-base font-black text-amber-300">128 h</div>
-            <div class="text-[10px] text-slate-300 font-semibold uppercase tracking-wider">Volume Annuel</div>
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div class="rounded-xl bg-white/10 px-2.5 py-1.5 text-center border border-white/10">
+            <div id="curriculumAnnualHours" class="font-mono text-sm sm:text-base font-black text-amber-300">128 h</div>
+            <div class="text-[9px] text-slate-300 font-semibold uppercase tracking-wider">Volume Annuel</div>
           </div>
-          <div class="rounded-xl bg-white/10 px-3 py-2 text-center border border-white/10">
-            <div id="curriculumWeeklyHours" class="font-mono text-base font-black text-emerald-300">4 h/sem</div>
-            <div class="text-[10px] text-slate-300 font-semibold uppercase tracking-wider">Hebdomadaire</div>
+          <div class="rounded-xl bg-white/10 px-2.5 py-1.5 text-center border border-white/10">
+            <div id="curriculumWeeklyHours" class="font-mono text-sm sm:text-base font-black text-emerald-300">4 h/sem</div>
+            <div class="text-[9px] text-slate-300 font-semibold uppercase tracking-wider">Hebdo</div>
           </div>
-          <div class="rounded-xl bg-white/10 px-3 py-2 text-center border border-white/10">
-            <div id="curriculumTotalLessons" class="font-mono text-base font-black text-sky-300">14</div>
-            <div class="text-[10px] text-slate-300 font-semibold uppercase tracking-wider">Lecons</div>
+          <div class="rounded-xl bg-white/10 px-2.5 py-1.5 text-center border border-white/10">
+            <div id="curriculumTotalLessons" class="font-mono text-sm sm:text-base font-black text-sky-300">14</div>
+            <div class="text-[9px] text-slate-300 font-semibold uppercase tracking-wider">Lecons</div>
           </div>
         </div>
       </div>
 
       <div class="flex-1 overflow-y-auto pr-1">
-        <div id="curriculumTableContainer" class="rounded-2xl border border-slate-200 overflow-hidden bg-white shadow-2xs">
-          <table class="w-full text-left border-collapse">
+        <div id="curriculumTableContainer" class="rounded-2xl border border-slate-200 overflow-x-auto bg-white shadow-2xs">
+          <table class="w-full text-left border-collapse min-w-[600px]">
             <thead>
-              <tr class="bg-slate-100/80 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 border-b border-slate-200">
-                <th class="py-3 px-3 w-12 text-center">N</th>
-                <th class="py-3 px-4">Titre Officiel de la Lecon / Chapitre</th>
-                <th class="py-3 px-3 w-28 text-center">Trimestre</th>
-                <th class="py-3 px-3 w-24 text-center">Volume</th>
-                <th class="py-3 px-4 w-48">Domaine / Competence</th>
-                <th class="py-3 px-3 w-36 text-center">Action</th>
+              <tr class="bg-slate-100/80 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-slate-600 border-b border-slate-200">
+                <th class="py-2.5 px-3 w-10 text-center">N</th>
+                <th class="py-2.5 px-4">Titre Officiel de la Lecon</th>
+                <th class="py-2.5 px-3 w-24 text-center">Trimestre</th>
+                <th class="py-2.5 px-3 w-20 text-center">Volume</th>
+                <th class="py-2.5 px-4 w-40">Domaine</th>
+                <th class="py-2.5 px-3 w-28 text-center">Action</th>
               </tr>
             </thead>
             <tbody id="curriculumTableBody" class="divide-y divide-slate-100 text-xs"></tbody>
           </table>
         </div>
-        <div id="curriculumEmptyState" class="hidden text-center py-12 text-slate-400 space-y-2">
+        <div id="curriculumEmptyState" class="hidden text-center py-10 text-slate-400 space-y-2">
           <i data-lucide="inbox" class="h-8 w-8 mx-auto text-slate-300"></i>
           <p class="font-semibold text-xs">Aucune lecon ne correspond a votre filtre.</p>
         </div>
       </div>
 
-      <div class="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 text-xs">
-        <div class="flex items-center gap-2 text-slate-500 text-[11px]">
-          <i data-lucide="shield-check" class="h-4 w-4 text-emerald-600 shrink-0"></i>
+      <div class="mt-3 pt-2.5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2.5 shrink-0 text-xs">
+        <div class="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px]">
+          <i data-lucide="shield-check" class="h-3.5 w-3.5 text-emerald-600 shrink-0"></i>
           <span>Document officiel homologue DPFC MENAET 2026-2027</span>
         </div>
         <div class="flex items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onclick="printCurriculumSheet()"
-            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
+            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
           >
             <i data-lucide="printer" class="h-3.5 w-3.5"></i>
-            <span>Imprimer la Fiche</span>
+            <span>Imprimer</span>
           </button>
           <button
             type="button"
             onclick="closeCurriculumModal()"
-            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-5 py-2 font-bold text-white hover:bg-slate-800 transition"
+            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-4 py-1.5 font-bold text-white hover:bg-slate-800 transition"
           >
             <span>Fermer</span>
           </button>
@@ -1911,7 +1917,7 @@
     </div>
   </div>
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="data.js?v=3.0.2"></script>
+  <script src="app.js?v=3.0.2"></script>
 </body>
 </html>

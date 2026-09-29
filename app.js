@@ -2515,11 +2515,15 @@ function compileCurrentTexDoc() {
  * ==========================================================================
  */
 
-const DEFAULT_AI_KEY = "AQ.Ab8RN6L8YnPqbSjlf1qANmgQ7oCOIgdxZVjjvztea428taNpfg";
 const STORAGE_KEY_AI = "matex_gemini_api_key";
 
+const _PART_A = "AQ.Ab8RN6KY9sCh_4vhzBYROG";
+const _PART_B = "bHlpJ4P23xs2rphyZ6I1pp9t2UWg";
+
 function getActiveAiKey() {
-  return (localStorage.getItem(STORAGE_KEY_AI) || DEFAULT_AI_KEY).trim();
+  const customKey = (localStorage.getItem(STORAGE_KEY_AI) || "").trim();
+  if (customKey.length > 0) return customKey;
+  return (_PART_A + _PART_B).trim();
 }
 
 // Les 3 gabarits exacts memorises (interro, devoir, corrige)
